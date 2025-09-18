@@ -77,9 +77,9 @@ export const getColumns = ({
     ),
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue('totalInvoiced'));
-      const formatted = new Intl.NumberFormat('en-US', {
+      const formatted = new Intl.NumberFormat('pt-BR', {
         style: 'currency',
-        currency: 'USD',
+        currency: 'BRL',
       }).format(amount);
       return <div className="font-medium">{formatted}</div>;
     },
@@ -91,9 +91,9 @@ export const getColumns = ({
     ),
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue('totalPaid'));
-      const formatted = new Intl.NumberFormat('en-US', {
+      const formatted = new Intl.NumberFormat('pt-BR', {
         style: 'currency',
-        currency: 'USD',
+        currency: 'BRL',
       }).format(amount);
       return <div className="font-medium">{formatted}</div>;
     },
@@ -105,9 +105,9 @@ export const getColumns = ({
     ),
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue('balance'));
-      const formatted = new Intl.NumberFormat('en-US', {
+      const formatted = new Intl.NumberFormat('pt-BR', {
         style: 'currency',
-        currency: 'USD',
+        currency: 'BRL',
       }).format(amount);
       return <div className="font-medium">{formatted}</div>;
     },

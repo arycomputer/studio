@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { deleteClient, getClients, getInvoices } from '@/app/actions';
 import { Button } from '@/components/ui/button';
 import {
@@ -30,6 +30,9 @@ import { useRouter } from 'next/navigation';
 import { DataTable } from '@/components/data-table/data-table';
 import { getColumns } from './components/columns';
 import type { ColumnDef } from '@tanstack/react-table';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { ClientCard } from './components/client-card';
+import { Input } from '@/components/ui/input';
 
 export default function ClientsPage() {
   const [clients, setClients] = useState<Client[]>([]);
@@ -39,8 +42,10 @@ export default function ClientsPage() {
   const [isEditClientOpen, setEditClientOpen] = useState(false);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [isDeleteAlertOpen, setDeleteAlertOpen] = useState(false);
+  const [filter, setFilter] = useState('');
   const { toast } = useToast();
   const router = useRouter();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     async function fetchData() {
@@ -57,7 +62,7 @@ export default function ClientsPage() {
   }, []);
 
   const handleClientAdded = (newClient: Client) => {
-    setClients((prevClients) => [...prevClients, newClient]);
+    setClients((prevClients) => [newClient, ...prevClients].sort((a, b) => a.name.localeCompare(b.name)));
   };
 
   const handleClientUpdated = (updatedClient: Client) => {
@@ -105,7 +110,7 @@ export default function ClientsPage() {
     }
   };
 
-  const clientData = clients.map((client) => {
+  const clientData = useMemo(() => clients.map((client) => {
     const clientInvoices = invoices.filter((inv) => inv.clientId === client.id);
     const totalInvoiced = clientInvoices.reduce(
       (sum, inv) => sum + inv.amount,
@@ -116,7 +121,12 @@ export default function ClientsPage() {
       .reduce((sum, inv) => sum + inv.amount, 0);
     const balance = totalInvoiced - totalPaid;
     return { ...client, totalInvoiced, totalPaid, balance };
-  });
+  }), [clients, invoices]);
+
+  const filteredData = useMemo(() => {
+    if (!filter) return clientData;
+    return clientData.filter(client => client.name.toLowerCase().includes(filter.toLowerCase()));
+  }, [clientData, filter]);
 
   const columns = getColumns({
     onEdit: handleEditClick,
@@ -179,6 +189,32 @@ export default function ClientsPage() {
         <CardContent>
           {loading ? (
             <p>Carregando clientes...</p>
+          ) : isMobile === undefined ? (
+             <p>Carregando visualização...</p>
+          ) : isMobile ? (
+            <div className="space-y-4">
+              <Input 
+                placeholder="Filtrar por nome..." 
+                value={filter} 
+                onChange={(e) => setFilter(e.target.value)}
+                className="h-8 w-full"
+              />
+              <div className="space-y-4">
+              {filteredData.length > 0 ? (
+                filteredData.map(client => (
+                    <ClientCard 
+                        key={client.id}
+                        client={client}
+                        onEdit={handleEditClick}
+                        onDelete={handleDeleteClick}
+                        onViewInvoices={handleViewInvoicesClick}
+                    />
+                ))
+              ) : (
+                <p className="text-center text-muted-foreground pt-4">Nenhum cliente encontrado.</p>
+              )}
+              </div>
+            </div>
           ) : (
             <DataTable
               columns={columns as ColumnDef<unknown, unknown>[]}

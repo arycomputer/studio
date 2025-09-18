@@ -36,6 +36,9 @@ import { DataTable } from '@/components/data-table/data-table';
 import { getColumns } from './components/columns';
 import type { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { InvoiceCard } from './components/invoice-card';
+import { Input } from '@/components/ui/input';
 
 const statusTranslations: { [key: string]: string } = {
     paid: 'Pagas',
@@ -52,10 +55,12 @@ function InvoicesPageContent() {
   const [isDetailsSheetOpen, setDetailsSheetOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [isDeleteAlertOpen, setDeleteAlertOpen] = useState(false);
+  const [filter, setFilter] = useState('');
   const { toast } = useToast();
   const searchParams = useSearchParams();
   const router = useRouter();
   const {pathname} = useRouter();
+  const isMobile = useIsMobile();
 
   const clientId = searchParams.get('clientId');
   const filterStatus = searchParams.get('status');
@@ -79,7 +84,7 @@ function InvoicesPageContent() {
     fetchData();
   }, []);
 
-  const filteredInvoices = useMemo(() => {
+  const baseFilteredInvoices = useMemo(() => {
     let filtered = [...invoices];
     if (clientId) {
         filtered = filtered.filter((invoice) => invoice.clientId === clientId);
@@ -94,6 +99,12 @@ function InvoicesPageContent() {
     }
     return filtered;
   }, [invoices, clientId, filterStatus, filterDueDate]);
+  
+  const filteredInvoices = useMemo(() => {
+      if (!filter) return baseFilteredInvoices;
+      return baseFilteredInvoices.filter(invoice => invoice.clientName.toLowerCase().includes(filter.toLowerCase()));
+  }, [baseFilteredInvoices, filter]);
+
 
   const getFilterDescription = () => {
     if(clientId) {
@@ -120,7 +131,9 @@ function InvoicesPageContent() {
         invoice.id === updatedInvoice.id ? updatedInvoice : invoice
       )
     );
-    setSelectedInvoice(updatedInvoice);
+    if (selectedInvoice && selectedInvoice.id === updatedInvoice.id) {
+      setSelectedInvoice(updatedInvoice);
+    }
   };
 
   const handleViewDetails = (invoice: Invoice) => {
@@ -255,6 +268,32 @@ function InvoicesPageContent() {
         <CardContent>
           {loading ? (
             <p>Carregando faturas...</p>
+          ) : isMobile === undefined ? (
+             <p>Carregando visualização...</p>
+          ) : isMobile ? (
+             <div className="space-y-4">
+              <Input 
+                placeholder="Filtrar por cliente..." 
+                value={filter} 
+                onChange={(e) => setFilter(e.target.value)}
+                className="h-8 w-full"
+              />
+              <div className="space-y-4">
+              {filteredInvoices.length > 0 ? (
+                filteredInvoices.map(invoice => (
+                    <InvoiceCard 
+                        key={invoice.id}
+                        invoice={invoice}
+                        onViewDetails={handleViewDetails}
+                        onMarkAsPaid={handleMarkAsPaid}
+                        onDelete={handleDeleteClick}
+                    />
+                ))
+              ) : (
+                 <p className="text-center text-muted-foreground pt-4">Nenhuma fatura encontrada.</p>
+              )}
+              </div>
+            </div>
           ) : (
             <DataTable
               columns={columns as ColumnDef<unknown, unknown>[]}

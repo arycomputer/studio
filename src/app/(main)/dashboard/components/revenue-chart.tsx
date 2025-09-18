@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -23,7 +24,7 @@ export function RevenueChart({ invoices }: RevenueChartProps) {
   const monthlyRevenue = invoices
     .filter((invoice) => invoice.status === 'paid' && invoice.paymentDate)
     .reduce((acc, invoice) => {
-      const month = new Date(invoice.paymentDate!).toLocaleString('default', {
+      const month = new Date(invoice.paymentDate!).toLocaleString('pt-BR', {
         month: 'short',
       });
       acc[month] = (acc[month] || 0) + invoice.amount;
@@ -61,11 +62,14 @@ export function RevenueChart({ invoices }: RevenueChartProps) {
           fontSize={12}
           tickLine={false}
           axisLine={false}
-          tickFormatter={(value) => `$${value / 1000}k`}
+          tickFormatter={(value) => `R$${Number(value) / 1000}k`}
         />
         <Tooltip
           cursor={false}
-          content={<ChartTooltipContent indicator="dot" />}
+          content={<ChartTooltipContent 
+            indicator="dot" 
+            formatter={(value) => typeof value === 'number' ? value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : value}
+           />}
         />
         <Bar dataKey="total" fill="var(--color-total)" radius={4} />
       </BarChart>

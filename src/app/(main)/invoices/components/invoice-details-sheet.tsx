@@ -80,7 +80,10 @@ export function InvoiceDetailsSheet({
       return null;
     }
 
-    const daysOverdue = differenceInDays(new Date(), new Date(invoice.dueDate));
+    const dueDate = new Date(invoice.dueDate);
+    dueDate.setMinutes(dueDate.getMinutes() + dueDate.getTimezoneOffset());
+    const daysOverdue = differenceInDays(new Date(), dueDate);
+
     if (daysOverdue <= 0) return null;
     
     // Simple interest calculation: P * r * t
@@ -128,6 +131,12 @@ export function InvoiceDetailsSheet({
       setIsSubmitting(false);
     }
   }
+  
+  const getFormattedDate = (dateString: string) => {
+      const date = new Date(dateString);
+      date.setMinutes(date.getMinutes() + date.getTimezoneOffset());
+      return format(date, 'dd/MM/yyyy');
+  }
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
@@ -163,32 +172,32 @@ export function InvoiceDetailsSheet({
               </div>
               <div className="flex justify-between items-center">
                   <span className="font-medium text-muted-foreground">Valor Original</span>
-                  <span className="font-semibold">${invoice.amount.toLocaleString()}</span>
+                  <span className="font-semibold">{invoice.amount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
               </div>
               {interestCalculation && (
                   <>
                   <div className="flex justify-between items-center text-destructive">
                       <span className="font-medium">Juros ({interestCalculation.daysOverdue} dias)</span>
-                      <span className='font-semibold'>${interestCalculation.interest.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                      <span className='font-semibold'>{interestCalculation.interest.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
                   </div>
                   <div className="flex justify-between items-center text-lg">
                       <span className="font-medium">Valor Total</span>
-                      <span className="font-bold">${interestCalculation.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                      <span className="font-bold">{interestCalculation.totalAmount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
                   </div>
                   </>
               )}
               <div className="flex justify-between items-center">
                   <span className="font-medium text-muted-foreground">Data de Emissão</span>
-                  <span>{format(new Date(invoice.issueDate), 'dd/MM/yyyy')}</span>
+                  <span>{getFormattedDate(invoice.issueDate)}</span>
               </div>
               <div className="flex justify-between items-center">
                   <span className="font-medium text-muted-foreground">Data de Vencimento</span>
-                  <span>{format(new Date(invoice.dueDate), 'dd/MM/yyyy')}</span>
+                  <span>{getFormattedDate(invoice.dueDate)}</span>
               </div>
               {invoice.paymentDate && (
                   <div className="flex justify-between items-center">
                       <span className="font-medium text-muted-foreground">Data de Pagamento</span>
-                      <span>{format(new Date(invoice.paymentDate), 'dd/MM/yyyy')}</span>
+                      <span>{getFormattedDate(invoice.paymentDate)}</span>
                   </div>
               )}
               </div>
@@ -246,5 +255,3 @@ export function InvoiceDetailsSheet({
     </Sheet>
   );
 }
-
-    

@@ -14,6 +14,7 @@ import {
 import { MoreHorizontal } from 'lucide-react';
 import type { Invoice } from '@/lib/types';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
+import { format } from 'date-fns';
 
 const statusTranslations: { [key: string]: string } = {
   paid: 'Paga',
@@ -46,7 +47,9 @@ export const getColumns = ({
     ),
     cell: ({ row }) => {
       const date = new Date(row.getValue('dueDate'));
-      return <span>{date.toLocaleDateString()}</span>;
+      // Adjust for timezone to display the correct date
+      date.setMinutes(date.getMinutes() + date.getTimezoneOffset());
+      return <span>{format(date, 'dd/MM/yyyy')}</span>;
     },
   },
   {
@@ -79,9 +82,9 @@ export const getColumns = ({
     ),
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue('amount'));
-      const formatted = new Intl.NumberFormat('en-US', {
+      const formatted = new Intl.NumberFormat('pt-BR', {
         style: 'currency',
-        currency: 'USD',
+        currency: 'BRL',
       }).format(amount);
 
       return <div className="text-right font-medium">{formatted}</div>;

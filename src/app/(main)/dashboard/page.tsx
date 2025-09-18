@@ -64,7 +64,7 @@ export default async function DashboardPage() {
             </CardHeader>
             <CardContent>
                 <div className="text-2xl font-bold">
-                ${totalRevenue.toLocaleString()}
+                {totalRevenue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                 </div>
                 <p className="text-xs text-muted-foreground">
                 Receita de todos os tempos de faturas pagas.
@@ -82,7 +82,7 @@ export default async function DashboardPage() {
             </CardHeader>
             <CardContent>
                 <div className="text-2xl font-bold">
-                ${outstandingRevenue.toLocaleString()}
+                 {outstandingRevenue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                 </div>
                 <p className="text-xs text-muted-foreground">
                 De faturas pendentes e vencidas.
@@ -158,7 +158,7 @@ export default async function DashboardPage() {
                                         <div className="font-medium">{invoice.clientName}</div>
                                         </TableCell>
                                         <TableCell className="text-right py-2">
-                                        ${invoice.amount.toLocaleString()}
+                                        {invoice.amount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                         </TableCell>
                                     </TableRow>
                                     ))}
@@ -212,7 +212,7 @@ export default async function DashboardPage() {
                             </Badge>
                             </TableCell>
                             <TableCell className="text-right">
-                            ${invoice.amount.toLocaleString()}
+                            {invoice.amount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                             </TableCell>
                         </TableRow>
                         ))}
