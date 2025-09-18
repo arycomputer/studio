@@ -34,6 +34,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   filterColumnId: string;
   filterPlaceholder: string;
+  onRowDoubleClick?: (row: TData) => void;
 }
 
 export function DataTable<TData, TValue>({
@@ -41,6 +42,7 @@ export function DataTable<TData, TValue>({
   data,
   filterColumnId,
   filterPlaceholder,
+  onRowDoubleClick,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
@@ -104,6 +106,8 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
+                  onDoubleClick={() => onRowDoubleClick?.(row.original)}
+                  className={onRowDoubleClick ? 'cursor-pointer' : ''}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>

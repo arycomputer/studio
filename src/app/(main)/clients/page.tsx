@@ -185,6 +185,7 @@ export default function ClientsPage() {
               data={clientData}
               filterColumnId="name"
               filterPlaceholder="Filtrar por nome..."
+              onRowDoubleClick={handleEditClick}
             />
           )}
         </CardContent>
