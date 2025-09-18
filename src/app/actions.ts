@@ -1,10 +1,6 @@
 
 'use server';
 
-import {
-  generateRevenueProjectionReport,
-  RevenueProjectionReportInput,
-} from '@/ai/flows/revenue-projection-report';
 import { invoices as mockInvoices, clients as mockClients } from '@/lib/data';
 import { Client, Invoice, InvoiceStatus } from '@/lib/types';
 import {format} from 'date-fns';
@@ -136,32 +132,4 @@ export async function deleteInvoice(id: string): Promise<{ success: boolean }> {
     }
     mockInvoices.splice(invoiceIndex, 1);
     return { success: true };
-}
-
-export async function runRevenueReport() {
-  const invoices = await getInvoices();
-  
-  if (!invoices || invoices.length === 0) {
-    return { report: "Nenhum dado de fatura disponível para gerar um relatório." };
-  }
-  
-  const reportInput: RevenueProjectionReportInput = {
-    invoices: invoices.map((invoice) => ({
-      invoiceId: invoice.id,
-      clientId: invoice.clientId,
-      amount: invoice.amount,
-      dueDate: new Date(invoice.dueDate).toISOString(),
-      paymentDate: invoice.paymentDate
-        ? new Date(invoice.paymentDate).toISOString()
-        : null,
-    })),
-  };
-
-  try {
-    const result = await generateRevenueProjectionReport(reportInput);
-    return result;
-  } catch (error) {
-    console.error("Error generating revenue report:", error);
-    return { report: "Falha ao gerar o relatório de IA. Por favor, tente novamente mais tarde." };
-  }
 }

@@ -22,7 +22,6 @@ import {
 } from 'lucide-react';
 import { getInvoices, getClients } from '@/app/actions';
 import { RevenueChart } from './components/revenue-chart';
-import { RevenueReportGenerator } from './components/revenue-report-generator';
 
 const statusTranslations: { [key: string]: string } = {
   paid: 'Paga',
@@ -164,7 +163,6 @@ export default async function DashboardPage() {
                 </Table>
             </CardContent>
             </Card>
-             <RevenueReportGenerator />
         </div>
       </div>
     </div>
