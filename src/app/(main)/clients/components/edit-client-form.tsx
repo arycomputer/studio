@@ -650,5 +650,3 @@ export function EditClientForm({
     </Dialog>
   );
 }
-
-    
