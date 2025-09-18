@@ -1,4 +1,5 @@
 
+
 export type ClientDocument = {
   name: string;
   url: string;
@@ -38,5 +39,7 @@ export type Invoice = {
   status: InvoiceStatus;
   paymentDate: string | null;
 };
+
+    
 
     

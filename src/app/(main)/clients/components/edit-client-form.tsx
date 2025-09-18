@@ -31,6 +31,7 @@ import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const formSchema = z.object({
   name: z.string().min(2, 'O nome deve ter pelo menos 2 caracteres.'),
@@ -65,6 +66,7 @@ const formSchema = z.object({
     .positive('A taxa de juros deve ser um número positivo.')
     .optional(),
   newDocuments: z.any().optional(),
+  photo: z.any().optional(),
 });
 
 type EditClientFormProps = {
@@ -89,15 +91,19 @@ export function EditClientForm({
   const [isFetchingCep, setIsFetchingCep] = useState(false);
   const [currentClient, setCurrentClient] = useState<Client>(client);
   const [newFiles, setNewFiles] = useState<File[]>([]);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
   
   const cepValue = form.watch('address.cep');
+  const photoField = form.watch('photo');
+
 
   useEffect(() => {
     setCurrentClient(client);
+    setPhotoPreview(client.avatarUrl);
     form.reset({
       name: client.name,
       email: client.email,
@@ -115,6 +121,17 @@ export function EditClientForm({
     });
     setNewFiles([]);
   }, [client, isOpen, form]);
+
+  useEffect(() => {
+    if (photoField && photoField.length > 0) {
+      const file = photoField[0];
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPhotoPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  }, [photoField]);
 
   useEffect(() => {
     const fetchAddress = async () => {
@@ -230,7 +247,7 @@ export function EditClientForm({
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     try {
-      const updatedData = { ...values, newDocuments: newFiles };
+      const updatedData = { ...values, newDocuments: newFiles, photo: values.photo?.[0] };
       const updated = await updateClient(client.id, updatedData);
       onClientUpdated(updated);
       toast({
@@ -262,6 +279,29 @@ export function EditClientForm({
           <ScrollArea className="h-full">
             <Form {...form}>
               <form id="edit-client-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
+                 <FormField
+                    control={form.control}
+                    name="photo"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Foto do Cliente</FormLabel>
+                        <div className="flex items-center gap-4">
+                            <Avatar className="h-20 w-20">
+                            <AvatarImage src={photoPreview || undefined} alt="Foto do cliente" />
+                            <AvatarFallback>{client.name?.charAt(0)}</AvatarFallback>
+                            </Avatar>
+                            <FormControl>
+                            <Input 
+                                type="file" 
+                                accept="image/*"
+                                onChange={(e) => field.onChange(e.target.files)}
+                            />
+                            </FormControl>
+                        </div>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
                   <FormField
                   control={form.control}
                   name="name"
@@ -570,3 +610,5 @@ export function EditClientForm({
     </Dialog>
   );
 }
+
+    

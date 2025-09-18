@@ -76,7 +76,7 @@ export async function addClient(client: Omit<Client, 'id' | 'avatarUrl' | 'docum
   return newClient;
 }
 
-export async function updateClient(id: string, data: Omit<Client, 'id' | 'avatarUrl' | 'documents' | 'address'> & { address?: ClientAddress, newDocuments?: File[] }): Promise<Client> {
+export async function updateClient(id: string, data: Omit<Client, 'id' | 'avatarUrl' | 'documents' | 'address'> & { address?: ClientAddress, newDocuments?: File[], photo?: File }): Promise<Client> {
   await delay(500);
   const clientIndex = mockClients.findIndex(c => c.id === id);
   if (clientIndex === -1) {
@@ -91,6 +91,14 @@ export async function updateClient(id: string, data: Omit<Client, 'id' | 'avatar
     url: `/documents/${id}/${file.name}`, // Simulated URL
   })) || [];
 
+  let avatarUrl = existingClient.avatarUrl;
+  if (data.photo) {
+    // In a real app, you would upload the file to a storage service
+    // and get a URL. Here, we'll just simulate it.
+    avatarUrl = `/photos/${id}/${data.photo.name}`;
+  }
+
+
   const updatedClient: Client = {
     ...existingClient,
     name: data.name,
@@ -99,6 +107,7 @@ export async function updateClient(id: string, data: Omit<Client, 'id' | 'avatar
     address: data.address,
     rate: data.rate,
     documents: [...(existingClient.documents || []), ...newUploadedDocuments],
+    avatarUrl: avatarUrl,
   };
 
   mockClients[clientIndex] = updatedClient;
@@ -207,5 +216,7 @@ export async function deleteInvoice(id: string): Promise<{ success: boolean }> {
     mockInvoices.splice(invoiceIndex, 1);
     return { success: true };
 }
+
+    
 
     
