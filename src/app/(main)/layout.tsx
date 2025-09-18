@@ -45,40 +45,40 @@ export default function MainLayout({
           <SidebarContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <Link href="/dashboard">
+                <a href="/dashboard">
                   <SidebarMenuButton tooltip="Painel">
                     <Home />
                     <span>Painel</span>
                   </SidebarMenuButton>
-                </Link>
+                </a>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <Link href="/invoices">
+                <a href="/invoices">
                   <SidebarMenuButton tooltip="Faturas">
                     <FileText />
                     <span>Faturas</span>
                   </SidebarMenuButton>
-                </Link>
+                </a>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <Link href="/clients">
+                <a href="/clients">
                   <SidebarMenuButton tooltip="Clientes">
                     <Users />
                     <span>Clientes</span>
                   </SidebarMenuButton>
-                </Link>
+                </a>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarContent>
           <SidebarFooter>
             <SidebarMenu>
               <SidebarMenuItem>
-                <Link href="/settings">
+                <a href="/settings">
                   <SidebarMenuButton tooltip="Configurações">
                     <Settings />
                     <span>Configurações</span>
                   </SidebarMenuButton>
-                </Link>
+                </a>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarFooter>
