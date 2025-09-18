@@ -79,6 +79,10 @@ type EditClientFormProps = {
 const isImageFile = (file: File) => file.type.startsWith('image/');
 const isImageUrl = (url: string) => /\.(jpeg|jpg|gif|png|webp)$/i.test(url) || url.startsWith('data:image');
 
+const getInitials = (name: string) => {
+    return name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+}
+
 
 export function EditClientForm({
   isOpen,
@@ -181,7 +185,8 @@ export function EditClientForm({
   };
   
   const handleRemovePhoto = () => {
-    setPhotoPreview(null);
+    const initials = getInitials(form.getValues('name'));
+    setPhotoPreview(`https://placehold.co/80x80/E2E8F0/475569?text=${initials}`);
     form.setValue('photo', null);
     setIsPhotoRemoved(true);
   };
@@ -290,8 +295,8 @@ export function EditClientForm({
             Atualize os detalhes do cliente abaixo.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex-1 overflow-auto -mr-6 pr-6">
-          <ScrollArea className="h-full">
+        <div className="flex-1 overflow-hidden">
+          <ScrollArea className="h-full -mr-6 pr-6">
             <Form {...form}>
               <form id="edit-client-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4 pr-1">
                  <FormField
@@ -301,9 +306,9 @@ export function EditClientForm({
                         <FormItem>
                         <FormLabel>Foto do Cliente</FormLabel>
                         <div className="flex items-center gap-4">
-                            <Avatar className="h-20 w-20">
-                            <AvatarImage src={photoPreview || `https://avatar.vercel.sh/${client.id}.png?d=mp`} alt="Foto do cliente" />
-                            <AvatarFallback>{client.name?.charAt(0)}</AvatarFallback>
+                             <Avatar className="h-20 w-20">
+                                <AvatarImage src={photoPreview || ''} alt="Foto do cliente" />
+                                <AvatarFallback>{client.name?.charAt(0)}</AvatarFallback>
                             </Avatar>
                             <div className="flex flex-col gap-2">
                                 <FormControl>
@@ -634,5 +639,3 @@ export function EditClientForm({
     </Dialog>
   );
 }
-
-    

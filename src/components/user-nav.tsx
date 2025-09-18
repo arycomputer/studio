@@ -21,13 +21,22 @@ export function UserNav() {
   const [email, setEmail] = useState('usuario@exemplo.com');
   const [photo, setPhoto] = useState<string | null>(null);
 
+  const getInitials = (name: string) => {
+    return name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+  }
+
   const updateUserData = useCallback(() => {
-    const storedName = localStorage.getItem('user-name');
-    const storedEmail = localStorage.getItem('user-email');
+    const storedName = localStorage.getItem('user-name') || 'Usuário';
+    const storedEmail = localStorage.getItem('user-email') || 'usuario@exemplo.com';
     const storedPhoto = localStorage.getItem('user-photo');
-    if (storedName) setName(storedName);
-    if (storedEmail) setEmail(storedEmail);
-    if (storedPhoto) setPhoto(storedPhoto);
+    setName(storedName);
+    setEmail(storedEmail);
+    if (storedPhoto) {
+      setPhoto(storedPhoto);
+    } else {
+      const initials = getInitials(storedName);
+      setPhoto(`https://placehold.co/40x40/E2E8F0/475569?text=${initials}`);
+    }
   }, []);
 
   useEffect(() => {
@@ -49,7 +58,7 @@ export function UserNav() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-9 w-9">
-            <AvatarImage src={photo || 'https://picsum.photos/seed/10/40/40'} alt="@usuário" />
+            <AvatarImage src={photo || ''} alt="@usuário" />
             <AvatarFallback>{name.charAt(0).toUpperCase()}</AvatarFallback>
           </Avatar>
         </Button>

@@ -8,6 +8,10 @@ import {format} from 'date-fns';
 // Simulate a delay to mimic real-world network latency
 const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
+const getInitials = (name: string) => {
+    return name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+}
+
 // --- CEP Action ---
 export async function getAddressFromCEP(cep: string): Promise<Partial<ClientAddress> | { error: string }> {
   try {
@@ -62,6 +66,7 @@ export async function addClient(client: Omit<Client, 'id' | 'avatarUrl' | 'docum
     url: `/documents/${newId}/${file.name}`, // Simulated URL
   })) || [];
 
+  const initials = getInitials(client.name);
   const newClient: Client = {
     name: client.name,
     email: client.email,
@@ -69,7 +74,7 @@ export async function addClient(client: Omit<Client, 'id' | 'avatarUrl' | 'docum
     rate: client.rate,
     address: client.address,
     id: newId,
-    avatarUrl: `https://avatar.vercel.sh/${newId}.png`,
+    avatarUrl: `https://placehold.co/40x40/E2E8F0/475569?text=${initials}`,
     documents: uploadedDocuments,
   };
   mockClients.push(newClient);
@@ -101,7 +106,8 @@ export async function updateClient(id: string, data: Omit<Client, 'id' | 'avatar
 
   let avatarUrl = existingClient.avatarUrl;
   if (data.removePhoto) {
-    avatarUrl = `https://avatar.vercel.sh/${id}.png`; // Reset to default
+    const initials = getInitials(data.name);
+    avatarUrl = `https://placehold.co/40x40/E2E8F0/475569?text=${initials}`;
   } else if (data.photo) {
     // In a real app, you would upload the file to a storage service
     // and get a URL. Here, we'll convert to a data URI to simulate
@@ -227,5 +233,3 @@ export async function deleteInvoice(id: string): Promise<{ success: boolean }> {
     mockInvoices.splice(invoiceIndex, 1);
     return { success: true };
 }
-
-    
