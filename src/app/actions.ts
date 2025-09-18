@@ -7,6 +7,7 @@ import {
 } from '@/ai/flows/revenue-projection-report';
 import { invoices as mockInvoices, clients as mockClients } from '@/lib/data';
 import { Client, Invoice } from '@/lib/types';
+import {format} from 'date-fns';
 
 // Simulate a delay to mimic real-world network latency
 const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
@@ -32,6 +33,27 @@ export async function addClient(client: Omit<Client, 'id' | 'avatarUrl'>): Promi
   };
   mockClients.push(newClient);
   return newClient;
+}
+
+export async function addInvoice(invoice: Omit<Invoice, 'id' | 'clientName' | 'clientEmail' | 'issueDate' | 'status' | 'paymentDate' >): Promise<Invoice> {
+    await delay(500);
+    const client = mockClients.find(c => c.id === invoice.clientId);
+    if (!client) {
+        throw new Error('Client not found');
+    }
+
+    const newId = `INV${(mockInvoices.length + 1).toString().padStart(3, '0')}`;
+    const newInvoice: Invoice = {
+        ...invoice,
+        id: newId,
+        clientName: client.name,
+        clientEmail: client.email,
+        issueDate: format(new Date(), 'yyyy-MM-dd'),
+        status: 'pending',
+        paymentDate: null,
+    };
+    mockInvoices.unshift(newInvoice);
+    return newInvoice;
 }
 
 
