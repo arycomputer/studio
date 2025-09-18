@@ -24,13 +24,11 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { updateClient, deleteClientDocument, getAddressFromCEP } from '@/app/actions';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { Loader2, Trash2, Download, X, File as FileIcon } from 'lucide-react';
-import type { Client, ClientDocument } from '@/lib/types';
+import type { Client } from '@/lib/types';
 import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { states } from '@/lib/brazil-data';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
@@ -96,13 +94,7 @@ export function EditClientForm({
     resolver: zodResolver(formSchema),
   });
   
-  const selectedState = form.watch('address.estado');
   const cepValue = form.watch('address.cep');
-
-  const cities = useMemo(() => {
-    const stateData = states.find(s => s.sigla === selectedState);
-    return stateData ? stateData.cidades : [];
-  }, [selectedState]);
 
   useEffect(() => {
     setCurrentClient(client);
@@ -134,12 +126,8 @@ export function EditClientForm({
             if ('logradouro' in result) {
               form.setValue('address.logradouro', result.logradouro || '');
               form.setValue('address.bairro', result.bairro || '');
-              form.setValue('address.estado', result.estado || '', { shouldValidate: true });
-               // We need to set the city value after the state has been updated and the cities list is populated.
-              // A timeout helps ensure the re-render has occurred.
-              setTimeout(() => {
-                  form.setValue('address.cidade', result.cidade || '', { shouldValidate: true });
-              }, 0);
+              form.setValue('address.estado', result.estado || '');
+              form.setValue('address.cidade', result.cidade || '');
               form.setFocus('address.numero');
             } else {
                 toast({
@@ -395,47 +383,26 @@ export function EditClientForm({
                       <div className="grid grid-cols-5 gap-4">
                           <FormField
                               control={form.control}
-                              name="address.estado"
+                              name="address.cidade"
                               render={({ field }) => (
-                              <FormItem className="col-span-2">
-                                  <FormLabel>Estado</FormLabel>
-                                  <Select onValueChange={(value) => {
-                                      field.onChange(value)
-                                      form.setValue('address.cidade', '');
-                                  }} value={field.value ?? ''}>
-                                      <FormControl>
-                                      <SelectTrigger>
-                                          <SelectValue placeholder="UF" />
-                                      </SelectTrigger>
-                                      </FormControl>
-                                      <SelectContent>
-                                          {states.map(state => (
-                                              <SelectItem key={state.sigla} value={state.sigla}>{state.sigla}</SelectItem>
-                                          ))}
-                                      </SelectContent>
-                                  </Select>
+                              <FormItem className="col-span-3">
+                                  <FormLabel>Cidade</FormLabel>
+                                  <FormControl>
+                                  <Input placeholder="Sua cidade" {...field} value={field.value ?? ''} />
+                                  </FormControl>
                                   <FormMessage />
                               </FormItem>
                               )}
                           />
                           <FormField
                               control={form.control}
-                              name="address.cidade"
+                              name="address.estado"
                               render={({ field }) => (
-                              <FormItem className="col-span-3">
-                                  <FormLabel>Cidade</FormLabel>
-                                  <Select onValueChange={field.onChange} value={field.value ?? ''} disabled={!selectedState}>
-                                      <FormControl>
-                                      <SelectTrigger>
-                                          <SelectValue placeholder="Selecione a cidade" />
-                                      </SelectTrigger>
-                                      </FormControl>
-                                      <SelectContent>
-                                          {cities.map(city => (
-                                              <SelectItem key={city} value={city}>{city}</SelectItem>
-                                          ))}
-                                      </SelectContent>
-                                  </Select>
+                              <FormItem className="col-span-2">
+                                  <FormLabel>Estado</FormLabel>
+                                  <FormControl>
+                                  <Input placeholder="UF" {...field} value={field.value ?? ''} />
+                                  </FormControl>
                                   <FormMessage />
                               </FormItem>
                               )}
