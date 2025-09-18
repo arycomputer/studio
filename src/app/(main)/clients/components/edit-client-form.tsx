@@ -290,8 +290,8 @@ export function EditClientForm({
             Atualize os detalhes do cliente abaixo.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex-1 overflow-auto -mr-6 pr-6">
-          <ScrollArea className="h-full">
+        <div className="flex-1 overflow-hidden -mr-6 pr-6">
+          <ScrollArea className="h-full pr-6">
             <Form {...form}>
               <form id="edit-client-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
                  <FormField
@@ -632,5 +632,3 @@ export function EditClientForm({
     </Dialog>
   );
 }
-
-    

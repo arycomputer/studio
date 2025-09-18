@@ -19,7 +19,7 @@ import { useEffect, useState, useCallback } from "react";
 export function UserNav() {
   const [name, setName] = useState('Usuário');
   const [email, setEmail] = useState('usuario@exemplo.com');
-  const [photo, setPhoto] = useState('https://picsum.photos/seed/10/40/40');
+  const [photo, setPhoto] = useState<string | null>(null);
 
   const updateUserData = useCallback(() => {
     const storedName = localStorage.getItem('user-name');
@@ -49,7 +49,7 @@ export function UserNav() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-9 w-9">
-            <AvatarImage src={photo} alt="@usuário" />
+            <AvatarImage src={photo || 'https://picsum.photos/seed/10/40/40'} alt="@usuário" />
             <AvatarFallback>{name.charAt(0).toUpperCase()}</AvatarFallback>
           </Avatar>
         </Button>
