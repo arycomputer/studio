@@ -25,15 +25,15 @@ export function RevenueReportGenerator() {
       const result = await runRevenueReport();
       setReport(result.report);
       toast({
-        title: 'Report Generated',
-        description: 'AI revenue projection report has been successfully created.',
+        title: 'Relatório Gerado',
+        description: 'O relatório de projeção de receita da IA foi criado com sucesso.',
       });
     } catch (error) {
       console.error(error);
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: 'Failed to generate the report. Please try again.',
+        title: 'Erro',
+        description: 'Falha ao gerar o relatório. Por favor, tente novamente.',
       });
     } finally {
       setLoading(false);
@@ -45,10 +45,10 @@ export function RevenueReportGenerator() {
       <CardHeader>
         <CardTitle className="font-headline flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-accent" />
-          AI Revenue Projection
+          Projeção de Receita com IA
         </CardTitle>
         <CardDescription>
-          Analyze invoices to generate a revenue projection report.
+          Analise as faturas para gerar um relatório de projeção de receita.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -58,17 +58,17 @@ export function RevenueReportGenerator() {
           ) : (
             <Sparkles className="mr-2 h-4 w-4" />
           )}
-          Generate Report
+          Gerar Relatório
         </Button>
         {loading && (
           <p className="mt-4 text-center text-sm text-muted-foreground">
-            Generating report... this may take a moment.
+            Gerando relatório... isso pode levar um momento.
           </p>
         )}
         {report && (
           <div className="mt-4 rounded-lg border bg-secondary/30 p-4">
             <h3 className="font-semibold mb-2 font-headline">
-              Projection Summary
+              Resumo da Projeção
             </h3>
             <p className="text-sm text-foreground/80 whitespace-pre-wrap">
               {report}

@@ -44,29 +44,29 @@ export default async function ClientsPage() {
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-headline font-bold">Clients</h1>
+        <h1 className="text-3xl font-headline font-bold">Clientes</h1>
         <Button>
           <PlusCircle className="mr-2 h-4 w-4" />
-          Add Client
+          Adicionar Cliente
         </Button>
       </div>
       <Card>
         <CardHeader>
-          <CardTitle className="font-headline">Client Overview</CardTitle>
+          <CardTitle className="font-headline">Visão Geral dos Clientes</CardTitle>
           <CardDescription>
-            Manage your clients and view their financial history.
+            Gerencie seus clientes e veja o histórico financeiro deles.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Client</TableHead>
-                <TableHead>Total Invoiced</TableHead>
-                <TableHead>Total Paid</TableHead>
-                <TableHead>Outstanding</TableHead>
+                <TableHead>Cliente</TableHead>
+                <TableHead>Total Faturado</TableHead>
+                <TableHead>Total Pago</TableHead>
+                <TableHead>Pendente</TableHead>
                 <TableHead>
-                  <span className="sr-only">Actions</span>
+                  <span className="sr-only">Ações</span>
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -102,15 +102,15 @@ export default async function ClientsPage() {
                       <DropdownMenuTrigger asChild>
                         <Button aria-haspopup="true" size="icon" variant="ghost">
                           <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Toggle menu</span>
+                          <span className="sr-only">Alternar menu</span>
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
-                        <DropdownMenuItem>View Invoices</DropdownMenuItem>
+                        <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                        <DropdownMenuItem>Editar</DropdownMenuItem>
+                        <DropdownMenuItem>Ver Faturas</DropdownMenuItem>
                         <DropdownMenuItem className="text-destructive">
-                          Delete
+                          Excluir
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>

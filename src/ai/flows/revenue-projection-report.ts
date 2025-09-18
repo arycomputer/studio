@@ -42,14 +42,14 @@ const prompt = ai.definePrompt({
   name: 'revenueProjectionReportPrompt',
   input: {schema: RevenueProjectionReportInputSchema},
   output: {schema: RevenueProjectionReportOutputSchema},
-  prompt: `You are a financial analyst tasked with generating a revenue projection report based on a list of invoices.
+  prompt: `Você é um analista financeiro encarregado de gerar um relatório de projeção de receita com base em uma lista de faturas.
 
-  Analyze the following invoices and determine the status of each payment (complete, overdue, past due, or written off as a loss).
-  Provide a summary of the revenue projections, including key data points and insights.
+  Analise as seguintes faturas e determine o status de cada pagamento (concluído, pendente, atrasado ou baixado como prejuízo).
+  Forneça um resumo das projeções de receita, incluindo pontos de dados e insights importantes.
 
-  Invoices:
+  Faturas:
   {{#each invoices}}
-  - Invoice ID: {{invoiceId}}, Client ID: {{clientId}}, Amount: {{amount}}, Due Date: {{dueDate}}, Payment Date: {{paymentDate}}
+  - ID da Fatura: {{invoiceId}}, ID do Cliente: {{clientId}}, Valor: {{amount}}, Data de Vencimento: {{dueDate}}, Data de Pagamento: {{paymentDate}}
   {{/each}}
   `,
 });

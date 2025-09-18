@@ -20,46 +20,46 @@ export default function LoginPage() {
             <Briefcase className="h-10 w-10 text-primary" />
           </div>
           <CardTitle className="text-2xl font-headline">
-            Welcome back to FinanceFlow
+            Bem-vindo de volta ao FluxoFinanças
           </CardTitle>
           <CardDescription>
-            Enter your email below to log in to your account.
+            Digite seu e-mail abaixo para fazer login em sua conta.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">E-mail</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="m@example.com"
+                placeholder="m@exemplo.com"
                 required
               />
             </div>
             <div className="grid gap-2">
               <div className="flex items-center">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">Senha</Label>
                 <Link
                   href="#"
                   className="ml-auto inline-block text-sm underline"
                 >
-                  Forgot your password?
+                  Esqueceu sua senha?
                 </Link>
               </div>
               <Input id="password" type="password" required />
             </div>
             <Link href="/dashboard" className="w-full">
-              <Button className="w-full">Log in</Button>
+              <Button className="w-full">Entrar</Button>
             </Link>
             <Button variant="outline" className="w-full">
-              Login with Google
+              Entrar com Google
             </Button>
           </div>
           <div className="mt-4 text-center text-sm">
-            Don&apos;t have an account?{' '}
+            Não tem uma conta?{' '}
             <Link href="/signup" className="underline">
-              Sign up
+              Cadastre-se
             </Link>
           </div>
         </CardContent>

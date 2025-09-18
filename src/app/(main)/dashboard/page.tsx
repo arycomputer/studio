@@ -40,11 +40,11 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <h1 className="text-3xl font-headline font-bold">Dashboard</h1>
+      <h1 className="text-3xl font-headline font-bold">Painel</h1>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+            <CardTitle className="text-sm font-medium">Receita Total</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -52,14 +52,14 @@ export default async function DashboardPage() {
               ${totalRevenue.toLocaleString()}
             </div>
             <p className="text-xs text-muted-foreground">
-              All-time revenue from paid invoices.
+              Receita de todos os tempos de faturas pagas.
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Outstanding Revenue
+              Receita Pendente
             </CardTitle>
             <CreditCard className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -68,31 +68,31 @@ export default async function DashboardPage() {
               ${outstandingRevenue.toLocaleString()}
             </div>
             <p className="text-xs text-muted-foreground">
-              From pending and overdue invoices.
+              De faturas pendentes e vencidas.
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Clients</CardTitle>
+            <CardTitle className="text-sm font-medium">Clientes</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">+{clients.length}</div>
             <p className="text-xs text-muted-foreground">
-              Total number of clients managed.
+              Número total de clientes gerenciados.
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Invoices</CardTitle>
+            <CardTitle className="text-sm font-medium">Faturas Totais</CardTitle>
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{invoices.length}</div>
             <p className="text-xs text-muted-foreground">
-              Total invoices generated.
+              Total de faturas geradas.
             </p>
           </CardContent>
         </Card>
@@ -101,7 +101,7 @@ export default async function DashboardPage() {
       <div className="grid gap-4 lg:grid-cols-7">
         <Card className="lg:col-span-4">
           <CardHeader>
-            <CardTitle className="font-headline">Overview</CardTitle>
+            <CardTitle className="font-headline">Visão Geral</CardTitle>
           </CardHeader>
           <CardContent className="pl-2">
             <RevenueChart invoices={invoices} />
@@ -110,18 +110,18 @@ export default async function DashboardPage() {
         <div className="lg:col-span-3 flex flex-col gap-4">
             <Card>
             <CardHeader>
-                <CardTitle className="font-headline">Recent Invoices</CardTitle>
+                <CardTitle className="font-headline">Faturas Recentes</CardTitle>
                 <CardDescription>
-                The most recently created invoices.
+                As faturas criadas mais recentemente.
                 </CardDescription>
             </CardHeader>
             <CardContent>
                 <Table>
                 <TableHeader>
                     <TableRow>
-                    <TableHead>Client</TableHead>
+                    <TableHead>Cliente</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Amount</TableHead>
+                    <TableHead className="text-right">Valor</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>

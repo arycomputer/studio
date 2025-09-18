@@ -20,7 +20,7 @@ export function UserNav() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-9 w-9">
-            <AvatarImage src="https://picsum.photos/seed/10/40/40" alt="@user" />
+            <AvatarImage src="https://picsum.photos/seed/10/40/40" alt="@usuário" />
             <AvatarFallback>U</AvatarFallback>
           </Avatar>
         </Button>
@@ -28,9 +28,9 @@ export function UserNav() {
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">User</p>
+            <p className="text-sm font-medium leading-none">Usuário</p>
             <p className="text-xs leading-none text-muted-foreground">
-              user@example.com
+              usuario@exemplo.com
             </p>
           </div>
         </DropdownMenuLabel>
@@ -38,22 +38,22 @@ export function UserNav() {
         <DropdownMenuGroup>
           <DropdownMenuItem>
             <User className="mr-2 h-4 w-4" />
-            <span>Profile</span>
+            <span>Perfil</span>
           </DropdownMenuItem>
           <DropdownMenuItem>
             <CreditCard className="mr-2 h-4 w-4" />
-            <span>Billing</span>
+            <span>Faturamento</span>
           </DropdownMenuItem>
           <DropdownMenuItem>
             <Settings className="mr-2 h-4 w-4" />
-            <span>Settings</span>
+            <span>Configurações</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <Link href="/login">
             <DropdownMenuItem>
                 <LogOut className="mr-2 h-4 w-4" />
-                <span>Log out</span>
+                <span>Sair</span>
             </DropdownMenuItem>
         </Link>
       </DropdownMenuContent>

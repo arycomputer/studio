@@ -37,7 +37,7 @@ export function RevenueChart({ invoices }: RevenueChartProps) {
 
   const chartConfig = {
     total: {
-      label: 'Revenue',
+      label: 'Receita',
       color: 'hsl(var(--chart-1))',
     },
   };

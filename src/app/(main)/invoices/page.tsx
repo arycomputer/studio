@@ -31,31 +31,31 @@ export default async function InvoicesPage() {
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-headline font-bold">Invoices</h1>
+        <h1 className="text-3xl font-headline font-bold">Faturas</h1>
         <Button>
           <PlusCircle className="mr-2 h-4 w-4" />
-          Create Invoice
+          Criar Fatura
         </Button>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="font-headline">Invoice History</CardTitle>
+          <CardTitle className="font-headline">Histórico de Faturas</CardTitle>
           <CardDescription>
-            View and manage all your invoices.
+            Veja e gerencie todas as suas faturas.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Invoice ID</TableHead>
-                <TableHead>Client</TableHead>
-                <TableHead>Due Date</TableHead>
+                <TableHead>ID da Fatura</TableHead>
+                <TableHead>Cliente</TableHead>
+                <TableHead>Data de Vencimento</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
+                <TableHead className="text-right">Valor</TableHead>
                 <TableHead>
-                  <span className="sr-only">Actions</span>
+                  <span className="sr-only">Ações</span>
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -89,15 +89,15 @@ export default async function InvoicesPage() {
                       <DropdownMenuTrigger asChild>
                         <Button aria-haspopup="true" size="icon" variant="ghost">
                           <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Toggle menu</span>
+                          <span className="sr-only">Alternar menu</span>
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem>View Details</DropdownMenuItem>
-                        <DropdownMenuItem>Mark as Paid</DropdownMenuItem>
+                        <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                        <DropdownMenuItem>Ver Detalhes</DropdownMenuItem>
+                        <DropdownMenuItem>Marcar como Paga</DropdownMenuItem>
                         <DropdownMenuItem className="text-destructive">
-                          Delete
+                          Excluir
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>

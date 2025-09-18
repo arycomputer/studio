@@ -25,7 +25,7 @@ export async function runRevenueReport() {
   const invoices = await getInvoices();
   
   if (!invoices || invoices.length === 0) {
-    return { report: "No invoice data available to generate a report." };
+    return { report: "Nenhum dado de fatura disponível para gerar um relatório." };
   }
   
   const reportInput: RevenueProjectionReportInput = {
@@ -45,6 +45,6 @@ export async function runRevenueReport() {
     return result;
   } catch (error) {
     console.error("Error generating revenue report:", error);
-    throw new Error("Failed to generate AI report.");
+    throw new Error("Falha ao gerar o relatório de IA.");
   }
 }

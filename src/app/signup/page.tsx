@@ -20,41 +20,41 @@ export default function SignupPage() {
             <Briefcase className="h-10 w-10 text-primary" />
           </div>
           <CardTitle className="text-2xl font-headline">
-            Create an account
+            Crie uma conta
           </CardTitle>
           <CardDescription>
-            Enter your information to get started with FinanceFlow.
+            Insira suas informações para começar a usar o FluxoFinanças.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="full-name">Full Name</Label>
+              <Label htmlFor="full-name">Nome Completo</Label>
               <Input id="full-name" placeholder="John Doe" required />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">E-mail</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="m@example.com"
+                placeholder="m@exemplo.com"
                 required
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Senha</Label>
               <Input id="password" type="password" required />
             </div>
             <Link href="/dashboard">
               <Button type="submit" className="w-full">
-                Create account
+                Criar conta
               </Button>
             </Link>
           </div>
           <div className="mt-4 text-center text-sm">
-            Already have an account?{' '}
+            Já tem uma conta?{' '}
             <Link href="/login" className="underline">
-              Log in
+              Entrar
             </Link>
           </div>
         </CardContent>
