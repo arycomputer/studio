@@ -17,6 +17,7 @@ import {
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { useEffect } from 'react';
 
 const appearanceFormSchema = z.object({
   theme: z.enum(['light', 'dark'], {
@@ -26,24 +27,33 @@ const appearanceFormSchema = z.object({
 
 type AppearanceFormValues = z.infer<typeof appearanceFormSchema>;
 
-const defaultValues: Partial<AppearanceFormValues> = {
-  theme: 'light',
-};
 
 export function AppearanceForm() {
   const { toast } = useToast();
 
   const form = useForm<AppearanceFormValues>({
     resolver: zodResolver(appearanceFormSchema),
-    defaultValues,
+    defaultValues: {
+      theme: 'light',
+    },
   });
 
+  useEffect(() => {
+    const storedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+    if (storedTheme) {
+      form.setValue('theme', storedTheme);
+      document.documentElement.classList.toggle('dark', storedTheme === 'dark');
+    }
+  }, [form]);
+
   function onSubmit(data: AppearanceFormValues) {
+    localStorage.setItem('theme', data.theme);
+    document.documentElement.classList.toggle('dark', data.theme === 'dark');
+    
     toast({
       title: 'Preferências atualizadas!',
       description: 'A aparência do aplicativo foi salva.',
     });
-    console.log(data);
   }
 
   return (
@@ -69,6 +79,7 @@ export function AppearanceForm() {
                   <FormMessage />
                   <RadioGroup
                     onValueChange={field.onChange}
+                    value={field.value}
                     defaultValue={field.value}
                     className="grid max-w-md grid-cols-2 gap-8 pt-2"
                   >
