@@ -1,3 +1,4 @@
+
 'use server';
 
 import {
@@ -5,7 +6,7 @@ import {
   RevenueProjectionReportInput,
 } from '@/ai/flows/revenue-projection-report';
 import { invoices as mockInvoices, clients as mockClients } from '@/lib/data';
-import { Invoice } from '@/lib/types';
+import { Client, Invoice } from '@/lib/types';
 
 // Simulate a delay to mimic real-world network latency
 const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
@@ -16,10 +17,23 @@ export async function getInvoices(): Promise<Invoice[]> {
   return mockInvoices;
 }
 
-export async function getClients() {
+export async function getClients(): Promise<Client[]> {
   await delay(200);
   return mockClients;
 }
+
+export async function addClient(client: Omit<Client, 'id' | 'avatarUrl'>): Promise<Client> {
+  await delay(500);
+  const newId = (mockClients.length + 1).toString();
+  const newClient: Client = {
+    ...client,
+    id: newId,
+    avatarUrl: `https://picsum.photos/seed/${newId}/40/40`,
+  };
+  mockClients.push(newClient);
+  return newClient;
+}
+
 
 export async function runRevenueReport() {
   const invoices = await getInvoices();
