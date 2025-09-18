@@ -235,9 +235,9 @@ export function AddClientForm({
           </DialogDescription>
         </DialogHeader>
         <div className="flex-1 overflow-auto -mr-6 pr-6">
-            <ScrollArea className="h-full">
+          <ScrollArea className="h-full">
             <Form {...form}>
-            <form id="add-client-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
+              <form id="add-client-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4 pr-1">
                 <FormField
                   control={form.control}
                   name="name"
@@ -472,7 +472,7 @@ export function AddClientForm({
                 />
               </form>
             </Form>
-            </ScrollArea>
+          </ScrollArea>
         </div>
         <DialogFooter className="border-t pt-4">
           <Button

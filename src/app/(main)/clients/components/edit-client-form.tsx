@@ -77,7 +77,7 @@ type EditClientFormProps = {
 };
 
 const isImageFile = (file: File) => file.type.startsWith('image/');
-const isImageUrl = (url: string) => /\.(jpeg|jpg|gif|png|webp|data)$/i.test(url);
+const isImageUrl = (url: string) => /\.(jpeg|jpg|gif|png|webp)$/i.test(url) || url.startsWith('data:image');
 
 
 export function EditClientForm({
@@ -104,7 +104,7 @@ export function EditClientForm({
 
   useEffect(() => {
     setCurrentClient(client);
-    setPhotoPreview(client.avatarUrl);
+    setPhotoPreview(client.avatarUrl || null);
     setIsPhotoRemoved(false);
     form.reset({
       name: client.name,
@@ -290,9 +290,10 @@ export function EditClientForm({
             Atualize os detalhes do cliente abaixo.
           </DialogDescription>
         </DialogHeader>
-        <ScrollArea className="flex-1 -mr-6 pr-6">
+        <div className="flex-1 overflow-auto -mr-6 pr-6">
+          <ScrollArea className="h-full">
             <Form {...form}>
-              <form id="edit-client-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
+              <form id="edit-client-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4 pr-1">
                  <FormField
                     control={form.control}
                     name="photo"
@@ -301,7 +302,7 @@ export function EditClientForm({
                         <FormLabel>Foto do Cliente</FormLabel>
                         <div className="flex items-center gap-4">
                             <Avatar className="h-20 w-20">
-                            <AvatarImage src={photoPreview || `https://avatar.vercel.sh/${client.id}.png`} alt="Foto do cliente" />
+                            <AvatarImage src={photoPreview || `https://avatar.vercel.sh/${client.id}.png?d=mp`} alt="Foto do cliente" />
                             <AvatarFallback>{client.name?.charAt(0)}</AvatarFallback>
                             </Avatar>
                             <div className="flex flex-col gap-2">
@@ -313,10 +314,12 @@ export function EditClientForm({
                                     onChange={(e) => field.onChange(e.target.files)}
                                 />
                                 </FormControl>
-                                <Button type="button" variant="ghost" size="sm" className="text-destructive hover:text-destructive max-w-48" onClick={handleRemovePhoto}>
-                                    <UserX className="mr-2 h-4 w-4" />
-                                    Remover Foto
-                                </Button>
+                                {photoPreview &&
+                                    <Button type="button" variant="ghost" size="sm" className="text-destructive hover:text-destructive max-w-48" onClick={handleRemovePhoto}>
+                                        <UserX className="mr-2 h-4 w-4" />
+                                        Remover Foto
+                                    </Button>
+                                }
                             </div>
                         </div>
                         <FormMessage />
@@ -609,7 +612,8 @@ export function EditClientForm({
                   </div>
               </form>
             </Form>
-        </ScrollArea>
+          </ScrollArea>
+        </div>
         <DialogFooter className="border-t pt-4">
           <Button
             type="button"
@@ -630,3 +634,5 @@ export function EditClientForm({
     </Dialog>
   );
 }
+
+    

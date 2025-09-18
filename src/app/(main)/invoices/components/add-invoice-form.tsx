@@ -111,10 +111,10 @@ export function AddInvoiceForm({
             Preencha os detalhes abaixo para criar uma nova fatura.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex-1 overflow-hidden -mr-6 pr-6">
+        <div className="flex-1 overflow-auto -mr-6 pr-6">
           <ScrollArea className="h-full">
             <Form {...form}>
-              <form id="add-invoice-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 py-4">
+              <form id="add-invoice-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 py-4 pr-1">
                 <FormField
                   control={form.control}
                   name="clientId"

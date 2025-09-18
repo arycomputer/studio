@@ -21,7 +21,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
@@ -139,8 +138,9 @@ export function InvoiceDetailsSheet({
             Veja e edite os detalhes da fatura #{invoice.id}.
           </SheetDescription>
         </SheetHeader>
-        <div className="flex-1 overflow-hidden -mr-6 pr-6">
+        <div className="flex-1 overflow-auto -mr-6 pr-6">
             <ScrollArea className='h-full'>
+              <div className="pr-1">
                 <div className="mt-8 space-y-6">
                 <div className="flex justify-between items-center">
                     <span className="font-medium text-muted-foreground">Status</span>
@@ -223,6 +223,7 @@ export function InvoiceDetailsSheet({
                     />
                 </form>
                 </Form>
+              </div>
             </ScrollArea>
         </div>
         <SheetFooter className="border-t pt-4">
