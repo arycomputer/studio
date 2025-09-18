@@ -8,6 +8,30 @@ import {format} from 'date-fns';
 // Simulate a delay to mimic real-world network latency
 const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
+// --- CEP Action ---
+export async function getAddressFromCEP(cep: string): Promise<Partial<ClientAddress> | { error: string }> {
+  try {
+    const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+    if (!response.ok) {
+      throw new Error('Erro ao buscar CEP.');
+    }
+    const data = await response.json();
+    if (data.erro) {
+      return { error: 'CEP não encontrado.' };
+    }
+    return {
+      logradouro: data.logradouro,
+      bairro: data.bairro,
+      cidade: data.localidade,
+      estado: data.uf,
+    };
+  } catch (error) {
+    console.error('ViaCEP Error:', error);
+    return { error: 'Não foi possível buscar o endereço.' };
+  }
+}
+
+
 export async function getInvoices(): Promise<Invoice[]> {
   // In a real app, you'd fetch this from a database.
   await delay(200);

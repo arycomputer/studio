@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { updateClient, deleteClientDocument } from '@/app/actions';
+import { updateClient, deleteClientDocument, getAddressFromCEP } from '@/app/actions';
 import { useState, useEffect, useMemo } from 'react';
 import { Loader2, Trash2, Download, X, File as FileIcon } from 'lucide-react';
 import type { Client, ClientDocument } from '@/lib/types';
@@ -31,6 +31,7 @@ import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { states } from '@/lib/brazil-data';
+import { cn } from '@/lib/utils';
 
 const formSchema = z.object({
   name: z.string().min(2, 'O nome deve ter pelo menos 2 caracteres.'),
@@ -86,21 +87,17 @@ export function EditClientForm({
 }: EditClientFormProps) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isFetchingCep, setIsFetchingCep] = useState(false);
   const [currentClient, setCurrentClient] = useState<Client>(client);
   const [newFiles, setNewFiles] = useState<File[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: client.name,
-      email: client.email,
-      phone: client.phone || '',
-      address: client.address || {},
-      rate: client.rate || 0,
-    },
   });
   
   const selectedState = form.watch('address.estado');
+  const cepValue = form.watch('address.cep');
+
   const cities = useMemo(() => {
     const stateData = states.find(s => s.sigla === selectedState);
     return stateData ? stateData.cidades : [];
@@ -125,6 +122,37 @@ export function EditClientForm({
     });
     setNewFiles([]);
   }, [client, isOpen, form]);
+
+  useEffect(() => {
+    const fetchAddress = async () => {
+      const cep = cepValue?.replace(/\D/g, '');
+      if (cep && cep.length === 8) {
+        setIsFetchingCep(true);
+        const result = await getAddressFromCEP(cep);
+        setIsFetchingCep(false);
+        if ('logradouro' in result) {
+          form.setValue('address.logradouro', result.logradouro || '');
+          form.setValue('address.bairro', result.bairro || '');
+          form.setValue('address.estado', result.estado || '');
+          const stateData = states.find(s => s.sigla === result.estado);
+          if (stateData && stateData.cidades.includes(result.cidade || '')) {
+            form.setValue('address.cidade', result.cidade || '');
+          } else {
+             form.setValue('address.cidade', '');
+          }
+          form.setFocus('address.numero');
+        } else {
+            toast({
+                variant: 'destructive',
+                title: 'CEP não encontrado',
+                description: result.error,
+            })
+        }
+      }
+    };
+    fetchAddress();
+  }, [cepValue, form, toast]);
+
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -245,7 +273,14 @@ export function EditClientForm({
                         <FormItem className="col-span-1">
                           <FormLabel>CEP</FormLabel>
                           <FormControl>
-                            <Input placeholder="00000-000" {...field} />
+                             <div className="relative">
+                               <Input placeholder="00000-000" {...field} value={field.value ?? ''} />
+                               {isFetchingCep && (
+                                <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                                </div>
+                               )}
+                             </div>
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -259,7 +294,7 @@ export function EditClientForm({
                     <FormItem>
                       <FormLabel>Logradouro</FormLabel>
                       <FormControl>
-                        <Input placeholder="Rua Principal" {...field} />
+                        <Input placeholder="Rua Principal" {...field} value={field.value ?? ''} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -273,7 +308,7 @@ export function EditClientForm({
                         <FormItem>
                           <FormLabel>Número</FormLabel>
                           <FormControl>
-                            <Input placeholder="123" {...field} />
+                            <Input placeholder="123" {...field} value={field.value ?? ''} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -286,7 +321,7 @@ export function EditClientForm({
                         <FormItem>
                           <FormLabel>Bairro</FormLabel>
                           <FormControl>
-                            <Input placeholder="Centro" {...field} />
+                            <Input placeholder="Centro" {...field} value={field.value ?? ''} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -300,7 +335,7 @@ export function EditClientForm({
                     <FormItem>
                       <FormLabel>Referência</FormLabel>
                       <FormControl>
-                        <Input placeholder="Próximo ao parque" {...field} />
+                        <Input placeholder="Próximo ao parque" {...field} value={field.value ?? ''} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -316,7 +351,7 @@ export function EditClientForm({
                              <Select onValueChange={(value) => {
                                 field.onChange(value)
                                 form.setValue('address.cidade', '');
-                             }} defaultValue={field.value}>
+                             }} value={field.value ?? ''}>
                                 <FormControl>
                                 <SelectTrigger>
                                     <SelectValue placeholder="UF" />
@@ -338,7 +373,7 @@ export function EditClientForm({
                         render={({ field }) => (
                         <FormItem className="col-span-3">
                             <FormLabel>Cidade</FormLabel>
-                             <Select onValueChange={field.onChange} value={field.value} disabled={!selectedState}>
+                             <Select onValueChange={field.onChange} value={field.value ?? ''} disabled={!selectedState}>
                                 <FormControl>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Selecione a cidade" />
@@ -479,7 +514,7 @@ export function EditClientForm({
               
               <FormControl>
                   <Button type="button" variant="outline" asChild>
-                    <label htmlFor="new-file-upload" className="cursor-pointer w-full">
+                    <label htmlFor="new-file-upload" className={cn("cursor-pointer w-full", isSubmitting && "pointer-events-none opacity-50")}>
                         Adicionar Novos Arquivos...
                         <Input 
                           id="new-file-upload"
@@ -487,6 +522,7 @@ export function EditClientForm({
                           multiple
                           onChange={handleFileChange}
                           className="sr-only"
+                          disabled={isSubmitting}
                         />
                     </label>
                   </Button>
@@ -502,7 +538,7 @@ export function EditClientForm({
               >
                 Cancelar
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
+              <Button type="submit" disabled={isSubmitting || isFetchingCep}>
                 {isSubmitting ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : null}
@@ -515,5 +551,3 @@ export function EditClientForm({
     </Dialog>
   );
 }
-
-    
