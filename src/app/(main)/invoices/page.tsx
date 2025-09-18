@@ -195,6 +195,7 @@ function InvoicesPageContent() {
           onOpenChange={setDetailsSheetOpen}
           invoice={selectedInvoice}
           onInvoiceUpdated={handleInvoiceUpdated}
+          clients={clients}
         />
       )}
 

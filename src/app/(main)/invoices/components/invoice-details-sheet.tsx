@@ -31,11 +31,11 @@ import {
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { updateInvoiceStatus } from '@/app/actions';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Loader2 } from 'lucide-react';
-import type { Invoice, InvoiceStatus } from '@/lib/types';
+import type { Invoice, InvoiceStatus, Client } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
-import { format } from 'date-fns';
+import { format, differenceInDays } from 'date-fns';
 
 const formSchema = z.object({
   status: z.enum(['paid', 'pending', 'overdue', 'written-off']),
@@ -46,6 +46,7 @@ type InvoiceDetailsSheetProps = {
   onOpenChange: (isOpen: boolean) => void;
   invoice: Invoice;
   onInvoiceUpdated: (invoice: Invoice) => void;
+  clients: Client[];
 };
 
 export function InvoiceDetailsSheet({
@@ -53,6 +54,7 @@ export function InvoiceDetailsSheet({
   onOpenChange,
   invoice,
   onInvoiceUpdated,
+  clients,
 }: InvoiceDetailsSheetProps) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -63,6 +65,30 @@ export function InvoiceDetailsSheet({
       status: invoice.status,
     },
   });
+  
+  const client = useMemo(() => clients.find(c => c.id === invoice.clientId), [clients, invoice.clientId]);
+
+  const interestCalculation = useMemo(() => {
+    if (invoice.status !== 'overdue' || !client?.rate) {
+      return null;
+    }
+
+    const daysOverdue = differenceInDays(new Date(), new Date(invoice.dueDate));
+    if (daysOverdue <= 0) return null;
+    
+    // Simple interest calculation: P * r * t
+    // P = Principal amount, r = daily interest rate, t = time in days
+    const dailyRate = (client.rate / 100) / 30; // Assuming monthly rate
+    const interest = invoice.amount * dailyRate * daysOverdue;
+    const totalAmount = invoice.amount + interest;
+
+    return {
+        interest,
+        totalAmount,
+        daysOverdue
+    };
+  }, [invoice, client]);
+
 
   useEffect(() => {
     if (invoice) {
@@ -126,9 +152,21 @@ export function InvoiceDetailsSheet({
             <span>{invoice.clientName}</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="font-medium text-muted-foreground">Valor</span>
+            <span className="font-medium text-muted-foreground">Valor Original</span>
             <span className="font-semibold">${invoice.amount.toLocaleString()}</span>
           </div>
+           {interestCalculation && (
+            <>
+               <div className="flex justify-between items-center text-destructive">
+                <span className="font-medium">Juros ({interestCalculation.daysOverdue} dias)</span>
+                <span className='font-semibold'>${interestCalculation.interest.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              </div>
+              <div className="flex justify-between items-center text-lg">
+                <span className="font-medium">Valor Total</span>
+                <span className="font-bold">${interestCalculation.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              </div>
+            </>
+          )}
           <div className="flex justify-between items-center">
             <span className="font-medium text-muted-foreground">Data de Emissão</span>
             <span>{format(new Date(invoice.issueDate), 'dd/MM/yyyy')}</span>
