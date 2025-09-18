@@ -21,6 +21,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 const profileFormSchema = z.object({
   name: z.string().min(2, 'O nome deve ter pelo menos 2 caracteres.'),
   email: z.string().email('Por favor, insira um e-mail válido.'),
+  phone: z.string().optional(),
 });
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
@@ -28,6 +29,7 @@ type ProfileFormValues = z.infer<typeof profileFormSchema>;
 const defaultValues: Partial<ProfileFormValues> = {
   name: 'Usuário Exemplo',
   email: 'usuario@exemplo.com',
+  phone: '',
 };
 
 export function ProfileForm() {
@@ -85,6 +87,22 @@ export function ProfileForm() {
                   </FormControl>
                   <FormDescription>
                     Você pode gerenciar seus endereços de e-mail verificados.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Celular</FormLabel>
+                  <FormControl>
+                    <Input placeholder="(99) 99999-9999" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Seu número de celular para contato.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
