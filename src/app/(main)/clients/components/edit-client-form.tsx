@@ -23,10 +23,10 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { updateClient } from '@/app/actions';
+import { updateClient, deleteClientDocument } from '@/app/actions';
 import { useState, useEffect } from 'react';
-import { Loader2 } from 'lucide-react';
-import type { Client } from '@/lib/types';
+import { Loader2, Trash2, Download } from 'lucide-react';
+import type { Client, ClientDocument } from '@/lib/types';
 import { Textarea } from '@/components/ui/textarea';
 
 const formSchema = z.object({
@@ -35,7 +35,7 @@ const formSchema = z.object({
   phone: z.string().optional(),
   address: z.string().optional(),
   rate: z.coerce.number().optional(),
-  documents: z.any().optional(),
+  newDocuments: z.any().optional(),
 });
 
 type EditClientFormProps = {
@@ -53,6 +53,8 @@ export function EditClientForm({
 }: EditClientFormProps) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentClient, setCurrentClient] = useState<Client>(client);
+  const [newFiles, setNewFiles] = useState<File[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -65,25 +67,56 @@ export function EditClientForm({
     },
   });
 
-  const documents = form.watch('documents');
-
   useEffect(() => {
-    if (client) {
-      form.reset({
-        name: client.name,
-        email: client.email,
-        phone: client.phone || '',
-        address: client.address || '',
-        rate: client.rate || 0,
+    setCurrentClient(client);
+    form.reset({
+      name: client.name,
+      email: client.email,
+      phone: client.phone || '',
+      address: client.address || '',
+      rate: client.rate || 0,
+    });
+    setNewFiles([]);
+  }, [client, isOpen, form]);
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      setNewFiles(Array.from(event.target.files));
+    }
+  };
+
+  const removeNewFile = (indexToRemove: number) => {
+    setNewFiles(newFiles.filter((_, index) => index !== indexToRemove));
+  };
+  
+  const handleDocumentDelete = async (documentUrl: string) => {
+    try {
+      await deleteClientDocument(currentClient.id, documentUrl);
+      const updatedClient = {
+        ...currentClient,
+        documents: currentClient.documents?.filter(doc => doc.url !== documentUrl)
+      };
+      setCurrentClient(updatedClient);
+      onClientUpdated(updatedClient);
+      toast({
+        title: 'Sucesso!',
+        description: 'Documento excluído.',
+      });
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Erro',
+        description: 'Não foi possível excluir o documento.',
       });
     }
-  }, [client, form]);
+  };
+
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     try {
-      const documents = values.documents ? Array.from(values.documents) : [];
-      const updated = await updateClient(client.id, {...values, documents});
+      const updatedData = { ...values, newDocuments: newFiles };
+      const updated = await updateClient(client.id, updatedData);
       onClientUpdated(updated);
       toast({
         title: 'Sucesso!',
@@ -103,7 +136,7 @@ export function EditClientForm({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[525px]">
         <DialogHeader>
           <DialogTitle>Editar Cliente</DialogTitle>
           <DialogDescription>
@@ -181,41 +214,61 @@ export function EditClientForm({
                 </FormItem>
               )}
             />
+            
+            <div className='space-y-2'>
+              <FormLabel>Documentos Existentes</FormLabel>
+              {currentClient.documents && currentClient.documents.length > 0 ? (
+                <div className="space-y-2 rounded-md border p-2">
+                  {currentClient.documents.map(doc => (
+                    <div key={doc.url} className="flex items-center justify-between text-sm">
+                      <span className='truncate pr-2'>{doc.name}</span>
+                      <div className='flex items-center gap-2 flex-shrink-0'>
+                        <a href={doc.url} target="_blank" rel="noopener noreferrer" download>
+                            <Button type='button' variant="outline" size="icon" className="h-7 w-7">
+                                <Download className="h-4 w-4" />
+                            </Button>
+                        </a>
+                        <Button type='button' variant="destructive" size="icon" className="h-7 w-7" onClick={() => handleDocumentDelete(doc.url)}>
+                            <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className='text-sm text-muted-foreground'>Nenhum documento existente.</p>
+              )}
+            </div>
+
             <FormField
               control={form.control}
-              name="documents"
-              render={({ field: {onChange, value, ...rest } }) => (
+              name="newDocuments"
+              render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Novos Documentos</FormLabel>
+                  <FormLabel>Adicionar Novos Documentos</FormLabel>
                   <FormControl>
                      <Input 
                       type="file" 
                       multiple
-                      onChange={(e) => onChange(e.target.files)}
-                      {...rest}
+                      onChange={handleFileChange}
                     />
                   </FormControl>
                   <FormMessage />
-                  {documents && documents.length > 0 && (
-                    <div className="text-sm text-muted-foreground mt-2">
+                  {newFiles && newFiles.length > 0 && (
+                    <div className="text-sm text-muted-foreground mt-2 space-y-1">
                         <p className="font-medium">Novos arquivos selecionados:</p>
-                        <ul>
-                        {Array.from(documents).map((file: any, index: number) => (
-                            <li key={index}>- {file.name}</li>
+                        <ul className='space-y-1'>
+                        {newFiles.map((file, index) => (
+                            <li key={index} className='flex items-center justify-between'>
+                                <span>- {file.name}</span>
+                                <Button type="button" variant="ghost" size="icon" className='h-6 w-6' onClick={() => removeNewFile(index)}>
+                                    <Trash2 className="h-4 w-4 text-destructive" />
+                                </Button>
+                            </li>
                         ))}
                         </ul>
                     </div>
                     )}
-                  <div className='text-sm text-muted-foreground'>
-                    {client.documents && client.documents.length > 0 && (
-                      <div>
-                        <p className='font-medium mt-2'>Documentos existentes:</p>
-                        <ul>
-                          {client.documents.map(doc => <li key={doc.name}>- {doc.name}</li>)}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
                 </FormItem>
               )}
             />
@@ -241,3 +294,5 @@ export function EditClientForm({
     </Dialog>
   );
 }
+
+    

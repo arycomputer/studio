@@ -2,7 +2,7 @@
 'use server';
 
 import { invoices as mockInvoices, clients as mockClients } from '@/lib/data';
-import { Client, Invoice, InvoiceStatus } from '@/lib/types';
+import { Client, Invoice, InvoiceStatus, ClientDocument } from '@/lib/types';
 import {format} from 'date-fns';
 
 // Simulate a delay to mimic real-world network latency
@@ -11,6 +11,15 @@ const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 export async function getInvoices(): Promise<Invoice[]> {
   // In a real app, you'd fetch this from a database.
   await delay(200);
+  // Ensure status is updated based on due date
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  mockInvoices.forEach(inv => {
+    const dueDate = new Date(inv.dueDate);
+    if (inv.status === 'pending' && dueDate < today) {
+        inv.status = 'overdue';
+    }
+  });
   return mockInvoices;
 }
 
@@ -24,7 +33,7 @@ export async function addClient(client: Omit<Client, 'id' | 'avatarUrl' | 'docum
   const newId = (mockClients.length + 1).toString();
   
   // Simulate file upload
-  const uploadedDocuments = client.documents?.map(file => ({
+  const uploadedDocuments: ClientDocument[] = client.documents?.map(file => ({
     name: file.name,
     url: `/documents/${newId}/${file.name}`, // Simulated URL
   })) || [];
@@ -43,24 +52,29 @@ export async function addClient(client: Omit<Client, 'id' | 'avatarUrl' | 'docum
   return newClient;
 }
 
-export async function updateClient(id: string, data: Omit<Client, 'id' | 'avatarUrl' | 'documents'> & { documents?: File[] }): Promise<Client> {
+export async function updateClient(id: string, data: Omit<Client, 'id' | 'avatarUrl' | 'documents'> & { newDocuments?: File[] }): Promise<Client> {
   await delay(500);
   const clientIndex = mockClients.findIndex(c => c.id === id);
   if (clientIndex === -1) {
     throw new Error('Client not found');
   }
 
-  // Simulate file upload - in a real app, you'd handle new files, keep existing, or delete
-  const existingDocuments = mockClients[clientIndex].documents || [];
-  const newDocuments = data.documents?.map(file => ({
+  const existingClient = mockClients[clientIndex];
+  
+  // Simulate file upload for new documents
+  const newUploadedDocuments: ClientDocument[] = data.newDocuments?.map(file => ({
     name: file.name,
     url: `/documents/${id}/${file.name}`, // Simulated URL
   })) || [];
 
-  const updatedClient = { 
-    ...mockClients[clientIndex], 
-    ...data,
-    documents: [...existingDocuments, ...newDocuments],
+  const updatedClient: Client = {
+    ...existingClient,
+    name: data.name,
+    email: data.email,
+    phone: data.phone,
+    address: data.address,
+    rate: data.rate,
+    documents: [...(existingClient.documents || []), ...newUploadedDocuments],
   };
 
   mockClients[clientIndex] = updatedClient;
@@ -87,6 +101,24 @@ export async function deleteClient(id: string): Promise<{ success: boolean }> {
 }
 
 
+export async function deleteClientDocument(clientId: string, documentUrl: string): Promise<{ success: boolean }> {
+    await delay(500);
+    const clientIndex = mockClients.findIndex(c => c.id === clientId);
+    if (clientIndex === -1) {
+        throw new Error('Client not found');
+    }
+    const client = mockClients[clientIndex];
+    const documentIndex = client.documents?.findIndex(doc => doc.url === documentUrl);
+
+    if (documentIndex === undefined || documentIndex === -1) {
+        throw new Error('Document not found');
+    }
+
+    client.documents?.splice(documentIndex, 1);
+    return { success: true };
+}
+
+
 export async function addInvoice(invoice: Omit<Invoice, 'id' | 'clientName' | 'clientEmail' | 'issueDate' | 'status' | 'paymentDate' >): Promise<Invoice> {
     await delay(500);
     const client = mockClients.find(c => c.id === invoice.clientId);
@@ -95,13 +127,22 @@ export async function addInvoice(invoice: Omit<Invoice, 'id' | 'clientName' | 'c
     }
 
     const newId = `INV${(mockInvoices.length + 1).toString().padStart(3, '0')}`;
+    const issueDate = new Date();
+    const dueDate = new Date(invoice.dueDate);
+    
+    // Set time to 0 to compare dates correctly
+    issueDate.setHours(0,0,0,0);
+    dueDate.setHours(0,0,0,0);
+
+
     const newInvoice: Invoice = {
         ...invoice,
         id: newId,
         clientName: client.name,
         clientEmail: client.email,
-        issueDate: format(new Date(), 'yyyy-MM-dd'),
-        status: 'pending',
+        issueDate: format(issueDate, 'yyyy-MM-dd'),
+        dueDate: format(dueDate, 'yyyy-MM-dd'),
+        status: dueDate < issueDate ? 'overdue' : 'pending',
         paymentDate: null,
     };
     mockInvoices.unshift(newInvoice);
@@ -121,6 +162,14 @@ export async function updateInvoiceStatus(id: string, status: InvoiceStatus): Pr
     } else {
         mockInvoices[invoiceIndex].paymentDate = null;
     }
+    // Re-check overdue status in case of manual update
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const dueDate = new Date(mockInvoices[invoiceIndex].dueDate);
+    if (mockInvoices[invoiceIndex].status === 'pending' && dueDate < today) {
+        mockInvoices[invoiceIndex].status = 'overdue';
+    }
+
     return mockInvoices[invoiceIndex];
 }
 
@@ -134,3 +183,5 @@ export async function deleteInvoice(id: string): Promise<{ success: boolean }> {
     mockInvoices.splice(invoiceIndex, 1);
     return { success: true };
 }
+
+    

@@ -1,4 +1,9 @@
 
+export type ClientDocument = {
+  name: string;
+  url: string;
+}
+
 export type Client = {
   id: string;
   name: string;
@@ -6,7 +11,7 @@ export type Client = {
   avatarUrl: string;
   phone?: string;
   rate?: number;
-  documents?: { name: string; url: string }[];
+  documents?: ClientDocument[];
   address?: string;
 };
 
@@ -23,3 +28,5 @@ export type Invoice = {
   status: InvoiceStatus;
   paymentDate: string | null;
 };
+
+    

@@ -25,7 +25,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { addClient } from '@/app/actions';
 import { useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Trash2 } from 'lucide-react';
 import type { Client } from '@/lib/types';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -51,6 +51,7 @@ export function AddClientForm({
 }: AddClientFormProps) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [files, setFiles] = useState<File[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -63,19 +64,28 @@ export function AddClientForm({
     },
   });
 
-  const documents = form.watch('documents');
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      setFiles(Array.from(event.target.files));
+    }
+  };
+
+  const removeFile = (indexToRemove: number) => {
+    setFiles(files.filter((_, index) => index !== indexToRemove));
+  };
+
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     try {
-      const documents = values.documents ? Array.from(values.documents) : [];
-      const newClient = await addClient({...values, documents});
+      const newClient = await addClient({...values, documents: files});
       onClientAdded(newClient);
       toast({
         title: 'Sucesso!',
         description: 'Novo cliente adicionado.',
       });
       form.reset();
+      setFiles([]);
       onOpenChange(false);
     } catch (error) {
       toast({
@@ -89,7 +99,13 @@ export function AddClientForm({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog open={isOpen} onOpenChange={(open) => {
+        if (!open) {
+            form.reset();
+            setFiles([]);
+        }
+        onOpenChange(open);
+    }}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Adicionar Novo Cliente</DialogTitle>
@@ -171,24 +187,28 @@ export function AddClientForm({
              <FormField
               control={form.control}
               name="documents"
-              render={({ field: {onChange, value, ...rest }}) => (
+              render={({ field }) => (
                 <FormItem>
                   <FormLabel>Documentos</FormLabel>
                   <FormControl>
                     <Input 
                       type="file" 
                       multiple
-                      onChange={(e) => onChange(e.target.files)}
-                      {...rest}
+                      onChange={handleFileChange}
                     />
                   </FormControl>
                   <FormMessage />
-                   {documents && documents.length > 0 && (
+                   {files && files.length > 0 && (
                     <div className="text-sm text-muted-foreground mt-2">
                         <p className="font-medium">Arquivos selecionados:</p>
-                        <ul>
-                        {Array.from(documents).map((file: any, index: number) => (
-                            <li key={index}>- {file.name}</li>
+                        <ul className='space-y-1 mt-1'>
+                        {files.map((file, index) => (
+                            <li key={index} className='flex items-center justify-between'>
+                                <span>- {file.name}</span>
+                                <Button type="button" variant="ghost" size="icon" className='h-6 w-6' onClick={() => removeFile(index)}>
+                                    <Trash2 className="h-4 w-4 text-destructive" />
+                                </Button>
+                            </li>
                         ))}
                         </ul>
                     </div>
@@ -218,3 +238,5 @@ export function AddClientForm({
     </Dialog>
   );
 }
+
+    
