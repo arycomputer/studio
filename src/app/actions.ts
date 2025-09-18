@@ -54,15 +54,16 @@ export async function updateClient(id: string, data: Omit<Client, 'id' | 'avatar
   }
 
   // Simulate file upload - in a real app, you'd handle new files, keep existing, or delete
-  const uploadedDocuments = data.documents?.map(file => ({
+  const existingDocuments = mockClients[clientIndex].documents || [];
+  const newDocuments = data.documents?.map(file => ({
     name: file.name,
     url: `/documents/${id}/${file.name}`, // Simulated URL
-  })) || mockClients[clientIndex].documents;
+  })) || [];
 
   const updatedClient = { 
     ...mockClients[clientIndex], 
     ...data,
-    documents: uploadedDocuments, 
+    documents: [...existingDocuments, ...newDocuments],
   };
 
   mockClients[clientIndex] = updatedClient;
@@ -161,6 +162,6 @@ export async function runRevenueReport() {
     return result;
   } catch (error) {
     console.error("Error generating revenue report:", error);
-    throw new Error("Falha ao gerar o relatório de IA.");
+    return { report: "Falha ao gerar o relatório de IA. Por favor, tente novamente mais tarde." };
   }
 }
