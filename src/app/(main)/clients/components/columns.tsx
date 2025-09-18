@@ -27,18 +27,6 @@ type GetColumnsProps = {
   onViewInvoices: (client: Client) => void;
 };
 
-const formatAddress = (address: Client['address']) => {
-    if (!address) return null;
-    const parts = [
-        address.logradouro,
-        address.numero,
-        address.bairro,
-        address.cidade,
-        address.estado,
-        address.cep,
-    ];
-    return parts.filter(Boolean).join(', ');
-}
 
 export const getColumns = ({
   onEdit,
@@ -55,7 +43,7 @@ export const getColumns = ({
       return (
         <div className="flex items-center gap-3">
           <Avatar className="h-9 w-9">
-            <AvatarImage src={client.avatarUrl} alt={client.name} />
+            <AvatarImage src={client.avatarUrl || `https://placehold.co/40x40/E2E8F0/475569?text=${client.name.charAt(0)}`} alt={client.name} />
             <AvatarFallback>{client.name.charAt(0)}</AvatarFallback>
           </Avatar>
           <div>
@@ -69,17 +57,15 @@ export const getColumns = ({
     },
   },
   {
-    accessorKey: 'email',
+    accessorKey: 'phone',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Contato" />
+      <DataTableColumnHeader column={column} title="Celular" />
     ),
     cell: ({ row }) => {
       const client = row.original;
       return (
         <div>
-          <div className="text-sm">{client.email}</div>
-          <div className="text-sm text-muted-foreground">{client.phone}</div>
-          <div className="text-sm text-muted-foreground truncate max-w-xs">{formatAddress(client.address)}</div>
+          <div className="text-sm">{client.phone}</div>
         </div>
       );
     },
