@@ -42,6 +42,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
 
 type ClientData = Client & {
   totalInvoiced: number;
@@ -57,6 +58,7 @@ export default function ClientsPage() {
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [isDeleteAlertOpen, setDeleteAlertOpen] = useState(false);
   const { toast } = useToast();
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchData() {
@@ -92,6 +94,10 @@ export default function ClientsPage() {
   const handleDeleteClick = (client: Client) => {
     setSelectedClient(client);
     setDeleteAlertOpen(true);
+  };
+
+  const handleViewInvoicesClick = (client: Client) => {
+    router.push(`/invoices?clientId=${client.id}`);
   };
 
   const handleDeleteConfirm = async () => {
@@ -246,7 +252,9 @@ export default function ClientsPage() {
                           <DropdownMenuItem onClick={() => handleEditClick(client)}>
                             Editar
                           </DropdownMenuItem>
-                          <DropdownMenuItem>Ver Faturas</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleViewInvoicesClick(client)}>
+                            Ver Faturas
+                          </DropdownMenuItem>
                           <DropdownMenuItem
                             className="text-destructive"
                             onClick={() => handleDeleteClick(client)}

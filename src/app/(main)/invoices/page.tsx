@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import {
   getInvoices,
   getClients,
@@ -25,7 +25,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { MoreHorizontal, PlusCircle } from 'lucide-react';
+import { MoreHorizontal, PlusCircle, X } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -47,8 +47,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function InvoicesPage() {
+function InvoicesPageContent() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,6 +58,13 @@ export default function InvoicesPage() {
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [isDeleteAlertOpen, setDeleteAlertOpen] = useState(false);
   const { toast } = useToast();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const clientId = searchParams.get('clientId');
+  const filteredClient = useMemo(() => {
+    return clients.find((c) => c.id === clientId);
+  }, [clients, clientId]);
 
   useEffect(() => {
     async function fetchData() {
@@ -71,6 +79,13 @@ export default function InvoicesPage() {
     }
     fetchData();
   }, []);
+
+  const filteredInvoices = useMemo(() => {
+    if (clientId) {
+      return invoices.filter((invoice) => invoice.clientId === clientId);
+    }
+    return invoices;
+  }, [invoices, clientId]);
 
   const handleInvoiceAdded = (newInvoice: Invoice) => {
     setInvoices((prevInvoices) => [newInvoice, ...prevInvoices]);
@@ -135,6 +150,10 @@ export default function InvoicesPage() {
     }
   };
 
+  const clearFilter = () => {
+    router.push('/invoices');
+  };
+
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center justify-between">
@@ -144,6 +163,24 @@ export default function InvoicesPage() {
           Criar Fatura
         </Button>
       </div>
+
+      {filteredClient && (
+        <div className="flex items-center gap-2 rounded-lg border bg-secondary/50 p-3">
+          <span className="text-sm">
+            Mostrando faturas para o cliente:{' '}
+            <span className="font-semibold">{filteredClient.name}</span>
+          </span>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6"
+            onClick={clearFilter}
+          >
+            <X className="h-4 w-4" />
+            <span className="sr-only">Limpar filtro</span>
+          </Button>
+        </div>
+      )}
 
       <AddInvoiceForm
         isOpen={isAddInvoiceOpen}
@@ -204,7 +241,7 @@ export default function InvoicesPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {invoices.map((invoice) => (
+                {filteredInvoices.map((invoice) => (
                   <TableRow key={invoice.id}>
                     <TableCell className="font-mono">{invoice.id}</TableCell>
                     <TableCell>{invoice.clientName}</TableCell>
@@ -273,3 +310,12 @@ export default function InvoicesPage() {
     </div>
   );
 }
+
+export default function InvoicesPage() {
+  return (
+    <Suspense fallback={<div>Carregando...</div>}>
+      <InvoicesPageContent />
+    </Suspense>
+  );
+}
+
