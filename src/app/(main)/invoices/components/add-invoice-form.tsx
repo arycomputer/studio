@@ -42,6 +42,7 @@ import { CalendarIcon, Loader2 } from 'lucide-react';
 import type { Client, Invoice } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const formSchema = z.object({
   clientId: z.string().min(1, 'Por favor, selecione um cliente.'),
@@ -103,13 +104,14 @@ export function AddInvoiceForm({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-md flex flex-col">
         <DialogHeader>
           <DialogTitle>Criar Nova Fatura</DialogTitle>
           <DialogDescription>
             Preencha os detalhes abaixo para criar uma nova fatura.
           </DialogDescription>
         </DialogHeader>
+        <ScrollArea className="pr-6 -mr-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <div className="grid gap-4 py-4">
@@ -190,7 +192,7 @@ export function AddInvoiceForm({
                 )}
               />
             </div>
-            <DialogFooter>
+            <DialogFooter className="sticky bottom-0 bg-background pt-4">
               <Button
                 type="button"
                 variant="outline"
@@ -208,6 +210,7 @@ export function AddInvoiceForm({
             </DialogFooter>
           </form>
         </Form>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );
