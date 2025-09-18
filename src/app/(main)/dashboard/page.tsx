@@ -1,3 +1,4 @@
+
 import {
   Card,
   CardContent,
@@ -19,9 +20,11 @@ import {
   Users,
   CreditCard,
   Activity,
+  AlertTriangle,
 } from 'lucide-react';
 import { getInvoices, getClients } from '@/app/actions';
 import { RevenueChart } from './components/revenue-chart';
+import { format } from 'date-fns';
 
 const statusTranslations: { [key: string]: string } = {
   paid: 'Paga',
@@ -44,6 +47,9 @@ export default async function DashboardPage() {
     .reduce((sum, invoice) => sum + invoice.amount, 0);
 
   const recentInvoices = invoices.slice(0, 5);
+
+  const today = format(new Date(), 'yyyy-MM-dd');
+  const dueToday = invoices.filter(invoice => invoice.dueDate === today && invoice.status !== 'paid');
 
   return (
     <div className="flex flex-col gap-8">
@@ -115,6 +121,43 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
         <div className="lg:col-span-3 flex flex-col gap-4">
+            <Card>
+                <CardHeader>
+                    <CardTitle className="font-headline flex items-center gap-2">
+                        <AlertTriangle className="h-5 w-5 text-destructive" />
+                        Vencimentos do Dia
+                    </CardTitle>
+                    <CardDescription>
+                        Faturas que precisam de atenção imediata.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                {dueToday.length > 0 ? (
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                            <TableHead>Cliente</TableHead>
+                            <TableHead className="text-right">Valor</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {dueToday.map((invoice) => (
+                            <TableRow key={invoice.id}>
+                                <TableCell className='py-2'>
+                                <div className="font-medium">{invoice.clientName}</div>
+                                </TableCell>
+                                <TableCell className="text-right py-2">
+                                ${invoice.amount.toLocaleString()}
+                                </TableCell>
+                            </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                    ) : (
+                    <p className="text-sm text-muted-foreground">Nenhuma fatura vence hoje.</p>
+                    )}
+                </CardContent>
+            </Card>
             <Card>
             <CardHeader>
                 <CardTitle className="font-headline">Faturas Recentes</CardTitle>
