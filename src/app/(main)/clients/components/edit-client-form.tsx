@@ -224,7 +224,7 @@ export function EditClientForm({
                       <span className='truncate pr-2'>{doc.name}</span>
                       <div className='flex items-center gap-2 flex-shrink-0'>
                         <a href={doc.url} target="_blank" rel="noopener noreferrer" download>
-                            <Button type='button' variant="outline" size="icon" className="h-7 w-7">
+                            <Button type='button' variant="outline" size="icon" className="h-7 w-7" disabled>
                                 <Download className="h-4 w-4" />
                             </Button>
                         </a>
@@ -294,5 +294,3 @@ export function EditClientForm({
     </Dialog>
   );
 }
-
-    
