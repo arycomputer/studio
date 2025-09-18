@@ -159,6 +159,31 @@ export function AddClientForm({
   const removeFile = (indexToRemove: number) => {
     setFiles(files.filter((_, index) => index !== indexToRemove));
   };
+  
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    let numericValue = value.replace(/\D/g, '');
+    
+    if (numericValue.length > 11) {
+      numericValue = numericValue.substring(0, 11);
+    }
+    
+    let formattedValue = '';
+    if (numericValue.length > 0) {
+      formattedValue = '(' + numericValue;
+    }
+    if (numericValue.length > 2) {
+      formattedValue = `(${numericValue.substring(0, 2)}) ${numericValue.substring(2)}`;
+    }
+    if (numericValue.length > 6 && numericValue.length <= 10) {
+       formattedValue = `(${numericValue.substring(0, 2)}) ${numericValue.substring(2, 6)}-${numericValue.substring(6)}`;
+    }
+    if (numericValue.length > 10) {
+       formattedValue = `(${numericValue.substring(0, 2)}) ${numericValue.substring(2, 7)}-${numericValue.substring(7, 11)}`;
+    }
+
+    form.setValue('phone', formattedValue);
+  };
 
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -235,7 +260,7 @@ export function AddClientForm({
                 <FormItem>
                   <FormLabel>Celular</FormLabel>
                   <FormControl>
-                    <Input placeholder="(99) 99999-9999" {...field} />
+                    <Input placeholder="(99) 99999-9999" {...field} onChange={handlePhoneChange} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -480,3 +505,5 @@ export function AddClientForm({
     </Dialog>
   );
 }
+
+    
