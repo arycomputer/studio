@@ -152,9 +152,9 @@ export function EditClientForm({
               name="rate"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Taxa (por hora)</FormLabel>
+                  <FormLabel>Taxa Mensal de Juros (%)</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="100" {...field} />
+                    <Input type="number" placeholder="1.0" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

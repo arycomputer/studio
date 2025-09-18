@@ -221,7 +221,7 @@ export default function ClientsPage() {
                         <div>
                           <div>{client.name}</div>
                           <div className="text-sm text-muted-foreground">
-                            Taxa: ${client.rate}/h
+                            Juros: {client.rate}%
                           </div>
                         </div>
                       </div>
