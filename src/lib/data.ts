@@ -1,11 +1,11 @@
 import { Client, Invoice } from './types';
 
 export const clients: Client[] = [
-  { id: '1', name: 'Innovate Inc.', email: 'contact@innovate.com', avatarUrl: 'https://picsum.photos/seed/1/40/40', phone: '123-456-7890', rate: 1.5, address: { logradouro: '123 Innovation Dr', cidade: 'Techville', estado: 'CA', cep: '12345' } },
-  { id: '2', name: 'Solutions Co.', email: 'hello@solutions.co', avatarUrl: 'https://picsum.photos/seed/2/40/40', phone: '234-567-8901', rate: 2.0, address: { logradouro: '456 Solutions Ave', cidade: 'Business City', estado: 'NY', cep: '67890' } },
-  { id: '3', name: 'Apex Enterprises', email: 'support@apex.com', avatarUrl: 'https://picsum.photos/seed/3/40/40', phone: '345-678-9012', rate: 1.2, address: { logradouro: '789 Apex St', cidade: 'Summit Peak', estado: 'CO', cep: '24680' } },
-  { id: '4', name: 'Quantum Dynamics', email: 'info@quantum.dev', avatarUrl: 'https://picsum.photos/seed/4/40/40', phone: '456-789-0123', rate: 2.5, address: { logradouro: '101 Quantum Blvd', cidade: 'Particle Park', estado: 'TX', cep: '13579' } },
-  { id: '5', name: 'Stellar Group', email: 'admin@stellar.org', avatarUrl: 'https://picsum.photos/seed/5/40/40', phone: '567-890-1234', rate: 1.8, address: { logradouro: '222 Stellar Rd', cidade: 'Galaxy Heights', estado: 'FL', cep: '97531' } },
+  { id: '1', name: 'Innovate Inc.', email: 'contact@innovate.com', avatarUrl: 'https://avatar.vercel.sh/1.png', phone: '123-456-7890', rate: 1.5, address: { logradouro: '123 Innovation Dr', cidade: 'Techville', estado: 'CA', cep: '12345' } },
+  { id: '2', name: 'Solutions Co.', email: 'hello@solutions.co', avatarUrl: 'https://avatar.vercel.sh/2.png', phone: '234-567-8901', rate: 2.0, address: { logradouro: '456 Solutions Ave', cidade: 'Business City', estado: 'NY', cep: '67890' } },
+  { id: '3', name: 'Apex Enterprises', email: 'support@apex.com', avatarUrl: 'https://avatar.vercel.sh/3.png', phone: '345-678-9012', rate: 1.2, address: { logradouro: '789 Apex St', cidade: 'Summit Peak', estado: 'CO', cep: '24680' } },
+  { id: '4', name: 'Quantum Dynamics', email: 'info@quantum.dev', avatarUrl: 'https://avatar.vercel.sh/4.png', phone: '456-789-0123', rate: 2.5, address: { logradouro: '101 Quantum Blvd', cidade: 'Particle Park', estado: 'TX', cep: '13579' } },
+  { id: '5', name: 'Stellar Group', email: 'admin@stellar.org', avatarUrl: 'https://avatar.vercel.sh/5.png', phone: '567-890-1234', rate: 1.8, address: { logradouro: '222 Stellar Rd', cidade: 'Galaxy Heights', estado: 'FL', cep: '97531' } },
 ];
 
 export const invoices: Invoice[] = [

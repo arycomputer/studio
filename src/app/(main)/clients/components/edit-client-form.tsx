@@ -290,8 +290,7 @@ export function EditClientForm({
             Atualize os detalhes do cliente abaixo.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex-1 overflow-hidden -mr-6 pr-6">
-          <ScrollArea className="h-full pr-6">
+        <ScrollArea className="flex-1 -mr-6 pr-6">
             <Form {...form}>
               <form id="edit-client-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
                  <FormField
@@ -302,7 +301,7 @@ export function EditClientForm({
                         <FormLabel>Foto do Cliente</FormLabel>
                         <div className="flex items-center gap-4">
                             <Avatar className="h-20 w-20">
-                            <AvatarImage src={photoPreview || undefined} alt="Foto do cliente" />
+                            <AvatarImage src={photoPreview || `https://avatar.vercel.sh/${client.id}.png`} alt="Foto do cliente" />
                             <AvatarFallback>{client.name?.charAt(0)}</AvatarFallback>
                             </Avatar>
                             <div className="flex flex-col gap-2">
@@ -610,8 +609,7 @@ export function EditClientForm({
                   </div>
               </form>
             </Form>
-          </ScrollArea>
-        </div>
+        </ScrollArea>
         <DialogFooter className="border-t pt-4">
           <Button
             type="button"
