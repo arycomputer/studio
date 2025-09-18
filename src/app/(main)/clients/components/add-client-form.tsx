@@ -239,287 +239,286 @@ export function AddClientForm({
             Preencha os detalhes abaixo para adicionar um novo cliente.
           </DialogDescription>
         </DialogHeader>
-        <ScrollArea className="pr-6 -mr-6">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nome</FormLabel>
-                  <FormControl>
-                    <Input placeholder="John Doe" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input placeholder="john.doe@example.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Celular</FormLabel>
-                  <FormControl>
-                    <Input placeholder="(99) 99999-9999" {...field} onChange={handlePhoneChange} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <div className="space-y-4 rounded-md border p-4">
-                 <h3 className="text-sm font-medium">Endereço</h3>
-                 <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="address.cep"
-                      render={({ field }) => (
-                        <FormItem className="col-span-1">
-                          <FormLabel>CEP</FormLabel>
-                          <FormControl>
-                             <div className="relative">
-                               <Input placeholder="00000-000" {...field} onChange={handleCepChange} />
-                               {isFetchingCep && (
-                                <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+        <div className="flex-1 overflow-hidden -mr-6 pr-6">
+          <ScrollArea className="h-full">
+            <Form {...form}>
+              <form id="add-client-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nome</FormLabel>
+                      <FormControl>
+                        <Input placeholder="John Doe" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input placeholder="john.doe@example.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Celular</FormLabel>
+                      <FormControl>
+                        <Input placeholder="(99) 99999-9999" {...field} onChange={handlePhoneChange} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="space-y-4 rounded-md border p-4">
+                    <h3 className="text-sm font-medium">Endereço</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="address.cep"
+                          render={({ field }) => (
+                            <FormItem className="col-span-1">
+                              <FormLabel>CEP</FormLabel>
+                              <FormControl>
+                                <div className="relative">
+                                  <Input placeholder="00000-000" {...field} onChange={handleCepChange} />
+                                  {isFetchingCep && (
+                                    <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                                        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                                    </div>
+                                  )}
                                 </div>
-                               )}
-                             </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                 </div>
-                 <FormField
-                  control={form.control}
-                  name="address.logradouro"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Logradouro</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Rua Principal" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div className="grid grid-cols-2 gap-4">
-                     <FormField
-                      control={form.control}
-                      name="address.numero"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Número</FormLabel>
-                          <FormControl>
-                            <Input placeholder="123" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                     <FormField
-                      control={form.control}
-                      name="address.bairro"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Bairro</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Centro" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                </div>
-                 <FormField
-                  control={form.control}
-                  name="address.referencia"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Referência</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Próximo ao parque" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                 <div className="grid grid-cols-5 gap-4">
-                     <FormField
-                        control={form.control}
-                        name="address.estado"
-                        render={({ field }) => (
-                        <FormItem className="col-span-2">
-                            <FormLabel>Estado</FormLabel>
-                             <Select onValueChange={(value) => {
-                                field.onChange(value)
-                                form.setValue('address.cidade', '');
-                             }} value={field.value ?? ''}>
-                                <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="UF" />
-                                </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                    {states.map(state => (
-                                        <SelectItem key={state.sigla} value={state.sigla}>{state.sigla}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                            <FormMessage />
-                        </FormItem>
-                        )}
-                    />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                    </div>
                     <FormField
-                        control={form.control}
-                        name="address.cidade"
-                        render={({ field }) => (
-                        <FormItem className="col-span-3">
-                            <FormLabel>Cidade</FormLabel>
-                             <Select onValueChange={field.onChange} value={field.value ?? ''} disabled={!selectedState}>
-                                <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Selecione a cidade" />
-                                </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                     {cities.map(city => (
-                                        <SelectItem key={city} value={city}>{city}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                            <FormMessage />
+                      control={form.control}
+                      name="address.logradouro"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Logradouro</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Rua Principal" {...field} />
+                          </FormControl>
+                          <FormMessage />
                         </FormItem>
-                        )}
+                      )}
                     />
+                    <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="address.numero"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Número</FormLabel>
+                              <FormControl>
+                                <Input placeholder="123" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="address.bairro"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Bairro</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Centro" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                    </div>
+                    <FormField
+                      control={form.control}
+                      name="address.referencia"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Referência</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Próximo ao parque" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <div className="grid grid-cols-5 gap-4">
+                        <FormField
+                            control={form.control}
+                            name="address.estado"
+                            render={({ field }) => (
+                            <FormItem className="col-span-2">
+                                <FormLabel>Estado</FormLabel>
+                                <Select onValueChange={(value) => {
+                                    field.onChange(value)
+                                    form.setValue('address.cidade', '');
+                                }} value={field.value ?? ''}>
+                                    <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="UF" />
+                                    </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {states.map(state => (
+                                            <SelectItem key={state.sigla} value={state.sigla}>{state.sigla}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="address.cidade"
+                            render={({ field }) => (
+                            <FormItem className="col-span-3">
+                                <FormLabel>Cidade</FormLabel>
+                                <Select onValueChange={field.onChange} value={field.value ?? ''} disabled={!selectedState}>
+                                    <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Selecione a cidade" />
+                                    </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {cities.map(city => (
+                                            <SelectItem key={city} value={city}>{city}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                    </div>
                 </div>
-            </div>
 
-            <FormField
-              control={form.control}
-              name="rate"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Taxa Mensal de Juros (%)</FormLabel>
-                  <FormControl>
-                    <Input type="number" placeholder="1.0" step="0.1" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-             <FormField
-              control={form.control}
-              name="documents"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Documentos</FormLabel>
-                   <FormControl>
-                     <Button type="button" variant="outline" asChild>
-                        <label htmlFor="file-upload" className={cn("cursor-pointer w-full", isSubmitting && "pointer-events-none opacity-50")}>
-                           Adicionar Arquivos...
-                           <Input 
-                              id="file-upload"
-                              type="file" 
-                              multiple
-                              onChange={handleFileChange}
-                              className="sr-only"
-                              disabled={isSubmitting}
-                           />
-                        </label>
-                     </Button>
-                  </FormControl>
-                  <FormMessage />
-                  
-                   {files && files.length > 0 && (
-                      <div className="space-y-2">
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                          {files.map((file, index) => (
-                            isImageFile(file) ? (
-                              <Card key={index} className="relative group">
-                                <CardContent className="p-0">
-                                  <Image
-                                    src={URL.createObjectURL(file)}
-                                    alt={file.name}
-                                    width={100}
-                                    height={100}
-                                    className="w-full h-24 object-cover rounded-md"
-                                  />
-                                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                </CardContent>
-                                <Button
-                                  type="button"
-                                  variant="destructive"
-                                  size="icon"
-                                  className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                                  onClick={() => removeFile(index)}
-                                >
-                                  <X className="h-4 w-4" />
-                                </Button>
-                              </Card>
-                            ) : null
-                          ))}
-                        </div>
-                        <ul className='text-sm text-muted-foreground space-y-1 pt-2'>
-                          {files.map((file, index) => (
-                            !isImageFile(file) ? (
-                              <li key={index} className='flex items-center justify-between bg-muted p-1 rounded-md'>
-                                  <div className="flex items-center gap-2 truncate">
-                                    <FileIcon className="h-4 w-4 flex-shrink-0" />
-                                    <span className="truncate">{file.name}</span>
-                                  </div>
-                                  <Button type="button" variant="ghost" size="icon" className='h-6 w-6 flex-shrink-0' onClick={() => removeFile(index)}>
-                                      <Trash2 className="h-4 w-4 text-destructive" />
-                                  </Button>
-                              </li>
-                            ) : null
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                </FormItem>
-              )}
-            />
-            <DialogFooter className="sticky bottom-0 bg-background pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  onOpenChange(false);
-                }}
-                disabled={isSubmitting}
-              >
-                Cancelar
-              </Button>
-              <Button type="submit" disabled={isSubmitting || isFetchingCep}>
-                {isSubmitting ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : null}
-                Adicionar Cliente
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
-        </ScrollArea>
+                <FormField
+                  control={form.control}
+                  name="rate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Taxa Mensal de Juros (%)</FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder="1.0" step="0.1" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="documents"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Documentos</FormLabel>
+                      <FormControl>
+                        <Button type="button" variant="outline" asChild>
+                            <label htmlFor="file-upload" className={cn("cursor-pointer w-full", isSubmitting && "pointer-events-none opacity-50")}>
+                              Adicionar Arquivos...
+                              <Input 
+                                  id="file-upload"
+                                  type="file" 
+                                  multiple
+                                  onChange={handleFileChange}
+                                  className="sr-only"
+                                  disabled={isSubmitting}
+                              />
+                            </label>
+                        </Button>
+                      </FormControl>
+                      <FormMessage />
+                      
+                      {files && files.length > 0 && (
+                          <div className="space-y-2">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                              {files.map((file, index) => (
+                                isImageFile(file) ? (
+                                  <Card key={index} className="relative group">
+                                    <CardContent className="p-0">
+                                      <Image
+                                        src={URL.createObjectURL(file)}
+                                        alt={file.name}
+                                        width={100}
+                                        height={100}
+                                        className="w-full h-24 object-cover rounded-md"
+                                      />
+                                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    </CardContent>
+                                    <Button
+                                      type="button"
+                                      variant="destructive"
+                                      size="icon"
+                                      className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                      onClick={() => removeFile(index)}
+                                    >
+                                      <X className="h-4 w-4" />
+                                    </Button>
+                                  </Card>
+                                ) : null
+                              ))}
+                            </div>
+                            <ul className='text-sm text-muted-foreground space-y-1 pt-2'>
+                              {files.map((file, index) => (
+                                !isImageFile(file) ? (
+                                  <li key={index} className='flex items-center justify-between bg-muted p-1 rounded-md'>
+                                      <div className="flex items-center gap-2 truncate">
+                                        <FileIcon className="h-4 w-4 flex-shrink-0" />
+                                        <span className="truncate">{file.name}</span>
+                                      </div>
+                                      <Button type="button" variant="ghost" size="icon" className='h-6 w-6 flex-shrink-0' onClick={() => removeFile(index)}>
+                                          <Trash2 className="h-4 w-4 text-destructive" />
+                                      </Button>
+                                  </li>
+                                ) : null
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                    </FormItem>
+                  )}
+                />
+              </form>
+            </Form>
+          </ScrollArea>
+        </div>
+        <DialogFooter className="border-t pt-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={isSubmitting}
+          >
+            Cancelar
+          </Button>
+          <Button type="submit" form="add-client-form" disabled={isSubmitting || isFetchingCep}>
+            {isSubmitting ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : null}
+            Adicionar Cliente
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 }
 
-    
     

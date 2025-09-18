@@ -139,91 +139,93 @@ export function InvoiceDetailsSheet({
             Veja e edite os detalhes da fatura #{invoice.id}.
           </SheetDescription>
         </SheetHeader>
-        <ScrollArea className='-mr-6 pr-6 h-full'>
-            <div className="mt-8 space-y-6">
-            <div className="flex justify-between items-center">
-                <span className="font-medium text-muted-foreground">Status</span>
-                <Badge
-                variant={
-                    invoice.status === 'paid'
-                    ? 'default'
-                    : invoice.status === 'overdue'
-                    ? 'destructive'
-                    : 'secondary'
-                }
-                className="capitalize"
-                >
-                {statusTranslations[invoice.status]}
-                </Badge>
-            </div>
-            <div className="flex justify-between items-center">
-                <span className="font-medium text-muted-foreground">Cliente</span>
-                <span>{invoice.clientName}</span>
-            </div>
-            <div className="flex justify-between items-center">
-                <span className="font-medium text-muted-foreground">Valor Original</span>
-                <span className="font-semibold">${invoice.amount.toLocaleString()}</span>
-            </div>
-            {interestCalculation && (
-                <>
-                <div className="flex justify-between items-center text-destructive">
-                    <span className="font-medium">Juros ({interestCalculation.daysOverdue} dias)</span>
-                    <span className='font-semibold'>${interestCalculation.interest.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                </div>
-                <div className="flex justify-between items-center text-lg">
-                    <span className="font-medium">Valor Total</span>
-                    <span className="font-bold">${interestCalculation.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                </div>
-                </>
-            )}
-            <div className="flex justify-between items-center">
-                <span className="font-medium text-muted-foreground">Data de Emissão</span>
-                <span>{format(new Date(invoice.issueDate), 'dd/MM/yyyy')}</span>
-            </div>
-            <div className="flex justify-between items-center">
-                <span className="font-medium text-muted-foreground">Data de Vencimento</span>
-                <span>{format(new Date(invoice.dueDate), 'dd/MM/yyyy')}</span>
-            </div>
-            {invoice.paymentDate && (
+        <div className="flex-1 overflow-hidden -mr-6 pr-6">
+            <ScrollArea className='h-full'>
+                <div className="mt-8 space-y-6">
                 <div className="flex justify-between items-center">
-                    <span className="font-medium text-muted-foreground">Data de Pagamento</span>
-                    <span>{format(new Date(invoice.paymentDate), 'dd/MM/yyyy')}</span>
-                </div>
-            )}
-            </div>
-            <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="mt-8">
-                <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>Atualizar Status</FormLabel>
-                    <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        disabled={isSubmitting}
+                    <span className="font-medium text-muted-foreground">Status</span>
+                    <Badge
+                    variant={
+                        invoice.status === 'paid'
+                        ? 'default'
+                        : invoice.status === 'overdue'
+                        ? 'destructive'
+                        : 'secondary'
+                    }
+                    className="capitalize"
                     >
-                        <FormControl>
-                        <SelectTrigger>
-                            <SelectValue placeholder="Selecione um status" />
-                        </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                        <SelectItem value="pending">Pendente</SelectItem>
-                        <SelectItem value="paid">Paga</SelectItem>
-                        <SelectItem value="overdue">Atrasada</SelectItem>
-                        <SelectItem value="written-off">Baixada</SelectItem>
-                        </SelectContent>
-                    </Select>
-                    <FormMessage />
-                    </FormItem>
+                    {statusTranslations[invoice.status]}
+                    </Badge>
+                </div>
+                <div className="flex justify-between items-center">
+                    <span className="font-medium text-muted-foreground">Cliente</span>
+                    <span>{invoice.clientName}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                    <span className="font-medium text-muted-foreground">Valor Original</span>
+                    <span className="font-semibold">${invoice.amount.toLocaleString()}</span>
+                </div>
+                {interestCalculation && (
+                    <>
+                    <div className="flex justify-between items-center text-destructive">
+                        <span className="font-medium">Juros ({interestCalculation.daysOverdue} dias)</span>
+                        <span className='font-semibold'>${interestCalculation.interest.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-lg">
+                        <span className="font-medium">Valor Total</span>
+                        <span className="font-bold">${interestCalculation.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    </div>
+                    </>
                 )}
-                />
-            </form>
-            </Form>
-        </ScrollArea>
-        <SheetFooter className="pt-4">
+                <div className="flex justify-between items-center">
+                    <span className="font-medium text-muted-foreground">Data de Emissão</span>
+                    <span>{format(new Date(invoice.issueDate), 'dd/MM/yyyy')}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                    <span className="font-medium text-muted-foreground">Data de Vencimento</span>
+                    <span>{format(new Date(invoice.dueDate), 'dd/MM/yyyy')}</span>
+                </div>
+                {invoice.paymentDate && (
+                    <div className="flex justify-between items-center">
+                        <span className="font-medium text-muted-foreground">Data de Pagamento</span>
+                        <span>{format(new Date(invoice.paymentDate), 'dd/MM/yyyy')}</span>
+                    </div>
+                )}
+                </div>
+                <Form {...form}>
+                <form id="status-update-form" onSubmit={form.handleSubmit(onSubmit)} className="mt-8">
+                    <FormField
+                    control={form.control}
+                    name="status"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Atualizar Status</FormLabel>
+                        <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            disabled={isSubmitting}
+                        >
+                            <FormControl>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Selecione um status" />
+                            </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                            <SelectItem value="pending">Pendente</SelectItem>
+                            <SelectItem value="paid">Paga</SelectItem>
+                            <SelectItem value="overdue">Atrasada</SelectItem>
+                            <SelectItem value="written-off">Baixada</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                </form>
+                </Form>
+            </ScrollArea>
+        </div>
+        <SheetFooter className="border-t pt-4">
             <Button
                 type="button"
                 variant="outline"
@@ -232,7 +234,7 @@ export function InvoiceDetailsSheet({
             >
                 Cancelar
             </Button>
-            <Button type="submit" form='status-update-form' disabled={isSubmitting} onClick={form.handleSubmit(onSubmit)}>
+            <Button type="submit" form='status-update-form' disabled={isSubmitting}>
                 {isSubmitting ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : null}
@@ -243,3 +245,5 @@ export function InvoiceDetailsSheet({
     </Sheet>
   );
 }
+
+    
