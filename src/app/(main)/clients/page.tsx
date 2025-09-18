@@ -3,7 +3,6 @@
 
 import { useEffect, useState } from 'react';
 import { deleteClient, getClients, getInvoices } from '@/app/actions';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -12,22 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { MoreHorizontal, PlusCircle } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { PlusCircle } from 'lucide-react';
 import type { Client, Invoice } from '@/lib/types';
 import { AddClientForm } from './components/add-client-form';
 import { EditClientForm } from './components/edit-client-form';
@@ -43,11 +27,9 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-
-type ClientData = Client & {
-  totalInvoiced: number;
-  totalPaid: number;
-};
+import { DataTable } from '@/components/data-table/data-table';
+import { getColumns } from './components/columns';
+import type { ColumnDef } from '@tanstack/react-table';
 
 export default function ClientsPage() {
   const [clients, setClients] = useState<Client[]>([]);
@@ -123,7 +105,7 @@ export default function ClientsPage() {
     }
   };
 
-  const clientData: ClientData[] = clients.map((client) => {
+  const clientData = clients.map((client) => {
     const clientInvoices = invoices.filter((inv) => inv.clientId === client.id);
     const totalInvoiced = clientInvoices.reduce(
       (sum, inv) => sum + inv.amount,
@@ -132,7 +114,14 @@ export default function ClientsPage() {
     const totalPaid = clientInvoices
       .filter((inv) => inv.status === 'paid')
       .reduce((sum, inv) => sum + inv.amount, 0);
-    return { ...client, totalInvoiced, totalPaid };
+    const balance = totalInvoiced - totalPaid;
+    return { ...client, totalInvoiced, totalPaid, balance };
+  });
+
+  const columns = getColumns({
+    onEdit: handleEditClick,
+    onDelete: handleDeleteClick,
+    onViewInvoices: handleViewInvoicesClick,
   });
 
   return (
@@ -191,88 +180,12 @@ export default function ClientsPage() {
           {loading ? (
             <p>Carregando clientes...</p>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Cliente</TableHead>
-                  <TableHead>Contato</TableHead>
-                  <TableHead>Total Faturado</TableHead>
-                  <TableHead>Total Pago</TableHead>
-                  <TableHead>Pendente</TableHead>
-                  <TableHead>
-                    <span className="sr-only">Ações</span>
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {clientData.map((client) => (
-                  <TableRow key={client.id}>
-                    <TableCell className="font-medium">
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-9 w-9">
-                          <AvatarImage
-                            src={client.avatarUrl}
-                            alt={client.name}
-                          />
-                          <AvatarFallback>
-                            {client.name.charAt(0)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <div>{client.name}</div>
-                          <div className="text-sm text-muted-foreground">
-                            Juros: {client.rate}%
-                          </div>
-                        </div>
-                      </div>
-                    </TableCell>
-                     <TableCell>
-                      <div className="text-sm">{client.email}</div>
-                      <div className="text-sm text-muted-foreground">{client.phone}</div>
-                    </TableCell>
-                    <TableCell>
-                      ${client.totalInvoiced.toLocaleString()}
-                    </TableCell>
-                    <TableCell>${client.totalPaid.toLocaleString()}</TableCell>
-                    <TableCell>
-                      $
-                      {(
-                        client.totalInvoiced - client.totalPaid
-                      ).toLocaleString()}
-                    </TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            aria-haspopup="true"
-                            size="icon"
-                            variant="ghost"
-                          >
-                            <MoreHorizontal className="h-4 w-4" />
-                            <span className="sr-only">Alternar menu</span>
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                          <DropdownMenuItem onClick={() => handleEditClick(client)}>
-                            Editar
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleViewInvoicesClick(client)}>
-                            Ver Faturas
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="text-destructive"
-                            onClick={() => handleDeleteClick(client)}
-                          >
-                            Excluir
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <DataTable
+              columns={columns as ColumnDef<unknown, unknown>[]}
+              data={clientData}
+              filterColumnId="name"
+              filterPlaceholder="Filtrar por nome..."
+            />
           )}
         </CardContent>
       </Card>

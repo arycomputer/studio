@@ -8,7 +8,6 @@ import {
   deleteInvoice,
   updateInvoiceStatus,
 } from '@/app/actions';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -17,23 +16,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { MoreHorizontal, PlusCircle, X } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import type { Invoice, Client, InvoiceStatus } from '@/lib/types';
+import { PlusCircle, X } from 'lucide-react';
+import type { Invoice, Client } from '@/lib/types';
 import { AddInvoiceForm } from './components/add-invoice-form';
 import { InvoiceDetailsSheet } from './components/invoice-details-sheet';
 import { useToast } from '@/hooks/use-toast';
@@ -48,13 +32,9 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useRouter, useSearchParams } from 'next/navigation';
-
-const statusTranslations: { [key: string]: string } = {
-  paid: 'Paga',
-  pending: 'Pendente',
-  overdue: 'Atrasada',
-  'written-off': 'Baixada',
-};
+import { DataTable } from '@/components/data-table/data-table';
+import { getColumns } from './components/columns';
+import type { ColumnDef } from '@tanstack/react-table';
 
 function InvoicesPageContent() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -161,6 +141,12 @@ function InvoicesPageContent() {
     router.push('/invoices');
   };
 
+  const columns = getColumns({
+    onViewDetails: handleViewDetails,
+    onMarkAsPaid: handleMarkAsPaid,
+    onDelete: handleDeleteClick,
+  });
+
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center justify-between">
@@ -235,83 +221,12 @@ function InvoicesPageContent() {
           {loading ? (
             <p>Carregando faturas...</p>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>ID da Fatura</TableHead>
-                  <TableHead>Cliente</TableHead>
-                  <TableHead>Data de Vencimento</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Valor</TableHead>
-                  <TableHead>
-                    <span className="sr-only">Ações</span>
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredInvoices.map((invoice) => (
-                  <TableRow key={invoice.id}>
-                    <TableCell className="font-mono">{invoice.id}</TableCell>
-                    <TableCell>{invoice.clientName}</TableCell>
-                    <TableCell>
-                      {new Date(invoice.dueDate).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          invoice.status === 'paid'
-                            ? 'default'
-                            : invoice.status === 'overdue'
-                            ? 'destructive'
-                            : 'secondary'
-                        }
-                        className="capitalize"
-                      >
-                        {statusTranslations[invoice.status]}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      ${invoice.amount.toLocaleString()}
-                    </TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            aria-haspopup="true"
-                            size="icon"
-                            variant="ghost"
-                          >
-                            <MoreHorizontal className="h-4 w-4" />
-                            <span className="sr-only">Alternar menu</span>
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                          <DropdownMenuItem
-                            onClick={() => handleViewDetails(invoice)}
-                          >
-                            Ver Detalhes
-                          </DropdownMenuItem>
-                          {invoice.status !== 'paid' && (
-                            <DropdownMenuItem
-                              onClick={() => handleMarkAsPaid(invoice.id)}
-                            >
-                              Marcar como Paga
-                            </DropdownMenuItem>
-                          )}
-                          <DropdownMenuItem
-                            className="text-destructive"
-                            onClick={() => handleDeleteClick(invoice)}
-                          >
-                            Excluir
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <DataTable
+              columns={columns as ColumnDef<unknown, unknown>[]}
+              data={filteredInvoices}
+              filterColumnId="clientName"
+              filterPlaceholder="Filtrar por cliente..."
+            />
           )}
         </CardContent>
       </Card>
@@ -326,4 +241,3 @@ export default function InvoicesPage() {
     </Suspense>
   );
 }
-
