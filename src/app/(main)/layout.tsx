@@ -44,7 +44,7 @@ export default function MainLayout({
           <SidebarContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <Link href="/dashboard" legacyBehavior passHref>
+                <Link href="/dashboard" passHref>
                   <SidebarMenuButton tooltip="Painel">
                     <Home />
                     <span>Painel</span>
@@ -52,7 +52,7 @@ export default function MainLayout({
                 </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <Link href="/invoices" legacyBehavior passHref>
+                <Link href="/invoices" passHref>
                   <SidebarMenuButton tooltip="Faturas">
                     <FileText />
                     <span>Faturas</span>
@@ -60,7 +60,7 @@ export default function MainLayout({
                 </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <Link href="/clients" legacyBehavior passHref>
+                <Link href="/clients" passHref>
                   <SidebarMenuButton tooltip="Clientes">
                     <Users />
                     <span>Clientes</span>
@@ -72,7 +72,7 @@ export default function MainLayout({
           <SidebarFooter>
             <SidebarMenu>
               <SidebarMenuItem>
-                <Link href="#" legacyBehavior passHref>
+                <Link href="#" passHref>
                   <SidebarMenuButton tooltip="Configurações">
                     <Settings />
                     <span>Configurações</span>
