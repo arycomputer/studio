@@ -6,7 +6,7 @@ import {
   RevenueProjectionReportInput,
 } from '@/ai/flows/revenue-projection-report';
 import { invoices as mockInvoices, clients as mockClients } from '@/lib/data';
-import { Client, Invoice } from '@/lib/types';
+import { Client, Invoice, InvoiceStatus } from '@/lib/types';
 import {format} from 'date-fns';
 
 // Simulate a delay to mimic real-world network latency
@@ -35,6 +35,37 @@ export async function addClient(client: Omit<Client, 'id' | 'avatarUrl'>): Promi
   return newClient;
 }
 
+export async function updateClient(id: string, data: Omit<Client, 'id' | 'avatarUrl'>): Promise<Client> {
+  await delay(500);
+  const clientIndex = mockClients.findIndex(c => c.id === id);
+  if (clientIndex === -1) {
+    throw new Error('Client not found');
+  }
+  const updatedClient = { ...mockClients[clientIndex], ...data };
+  mockClients[clientIndex] = updatedClient;
+  return updatedClient;
+}
+
+
+export async function deleteClient(id: string): Promise<{ success: boolean }> {
+    await delay(500);
+    const clientIndex = mockClients.findIndex(c => c.id === id);
+    if (clientIndex === -1) {
+        throw new Error('Client not found');
+    }
+    mockClients.splice(clientIndex, 1);
+    // Also delete associated invoices
+    const invoicesToDelete = mockInvoices.filter(inv => inv.clientId === id);
+    invoicesToDelete.forEach(inv => {
+        const invIndex = mockInvoices.findIndex(i => i.id === inv.id);
+        if (invIndex !== -1) {
+            mockInvoices.splice(invIndex, 1);
+        }
+    });
+    return { success: true };
+}
+
+
 export async function addInvoice(invoice: Omit<Invoice, 'id' | 'clientName' | 'clientEmail' | 'issueDate' | 'status' | 'paymentDate' >): Promise<Invoice> {
     await delay(500);
     const client = mockClients.find(c => c.id === invoice.clientId);
@@ -56,6 +87,32 @@ export async function addInvoice(invoice: Omit<Invoice, 'id' | 'clientName' | 'c
     return newInvoice;
 }
 
+
+export async function updateInvoiceStatus(id: string, status: InvoiceStatus): Promise<Invoice> {
+    await delay(500);
+    const invoiceIndex = mockInvoices.findIndex(inv => inv.id === id);
+    if (invoiceIndex === -1) {
+        throw new Error('Invoice not found');
+    }
+    mockInvoices[invoiceIndex].status = status;
+    if (status === 'paid') {
+        mockInvoices[invoiceIndex].paymentDate = format(new Date(), 'yyyy-MM-dd');
+    } else {
+        mockInvoices[invoiceIndex].paymentDate = null;
+    }
+    return mockInvoices[invoiceIndex];
+}
+
+
+export async function deleteInvoice(id: string): Promise<{ success: boolean }> {
+    await delay(500);
+    const invoiceIndex = mockInvoices.findIndex(inv => inv.id === id);
+    if (invoiceIndex === -1) {
+        throw new Error('Invoice not found');
+    }
+    mockInvoices.splice(invoiceIndex, 1);
+    return { success: true };
+}
 
 export async function runRevenueReport() {
   const invoices = await getInvoices();

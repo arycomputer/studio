@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getClients, getInvoices } from '@/app/actions';
+import { deleteClient, getClients, getInvoices } from '@/app/actions';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -30,6 +30,18 @@ import {
 } from '@/components/ui/dropdown-menu';
 import type { Client, Invoice } from '@/lib/types';
 import { AddClientForm } from './components/add-client-form';
+import { EditClientForm } from './components/edit-client-form';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { useToast } from '@/hooks/use-toast';
 
 type ClientData = Client & {
   totalInvoiced: number;
@@ -41,6 +53,10 @@ export default function ClientsPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAddClientOpen, setAddClientOpen] = useState(false);
+  const [isEditClientOpen, setEditClientOpen] = useState(false);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [isDeleteAlertOpen, setDeleteAlertOpen] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     async function fetchData() {
@@ -58,6 +74,47 @@ export default function ClientsPage() {
 
   const handleClientAdded = (newClient: Client) => {
     setClients((prevClients) => [...prevClients, newClient]);
+  };
+
+  const handleClientUpdated = (updatedClient: Client) => {
+    setClients((prevClients) =>
+      prevClients.map((client) =>
+        client.id === updatedClient.id ? updatedClient : client
+      )
+    );
+  };
+
+  const handleEditClick = (client: Client) => {
+    setSelectedClient(client);
+    setEditClientOpen(true);
+  };
+
+  const handleDeleteClick = (client: Client) => {
+    setSelectedClient(client);
+    setDeleteAlertOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!selectedClient) return;
+    try {
+      await deleteClient(selectedClient.id);
+      setClients((prevClients) =>
+        prevClients.filter((client) => client.id !== selectedClient.id)
+      );
+      toast({
+        title: 'Cliente Excluído',
+        description: `O cliente ${selectedClient.name} foi excluído com sucesso.`,
+      });
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Erro',
+        description: 'Não foi possível excluir o cliente.',
+      });
+    } finally {
+      setDeleteAlertOpen(false);
+      setSelectedClient(null);
+    }
   };
 
   const clientData: ClientData[] = clients.map((client) => {
@@ -88,6 +145,33 @@ export default function ClientsPage() {
         onClientAdded={handleClientAdded}
       />
 
+      {selectedClient && (
+        <EditClientForm
+          isOpen={isEditClientOpen}
+          onOpenChange={setEditClientOpen}
+          client={selectedClient}
+          onClientUpdated={handleClientUpdated}
+        />
+      )}
+
+      <AlertDialog open={isDeleteAlertOpen} onOpenChange={setDeleteAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação não pode ser desfeita. Isso excluirá permanentemente o
+              cliente e todas as suas faturas associadas.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <Card>
         <CardHeader>
           <CardTitle className="font-headline">
@@ -99,7 +183,7 @@ export default function ClientsPage() {
         </CardHeader>
         <CardContent>
           {loading ? (
-             <p>Carregando clientes...</p>
+            <p>Carregando clientes...</p>
           ) : (
             <Table>
               <TableHeader>
@@ -159,9 +243,14 @@ export default function ClientsPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                          <DropdownMenuItem>Editar</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleEditClick(client)}>
+                            Editar
+                          </DropdownMenuItem>
                           <DropdownMenuItem>Ver Faturas</DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive">
+                          <DropdownMenuItem
+                            className="text-destructive"
+                            onClick={() => handleDeleteClick(client)}
+                          >
                             Excluir
                           </DropdownMenuItem>
                         </DropdownMenuContent>
