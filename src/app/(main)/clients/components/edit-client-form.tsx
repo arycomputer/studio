@@ -24,12 +24,13 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { updateClient, deleteClientDocument } from '@/app/actions';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Loader2, Trash2, Download, X, File as FileIcon } from 'lucide-react';
 import type { Client, ClientDocument } from '@/lib/types';
-import { Textarea } from '@/components/ui/textarea';
 import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { states } from '@/lib/brazil-data';
 
 const formSchema = z.object({
   name: z.string().min(2, 'O nome deve ter pelo menos 2 caracteres.'),
@@ -98,6 +99,12 @@ export function EditClientForm({
       rate: client.rate || 0,
     },
   });
+  
+  const selectedState = form.watch('address.estado');
+  const cities = useMemo(() => {
+    const stateData = states.find(s => s.sigla === selectedState);
+    return stateData ? stateData.cidades : [];
+  }, [selectedState]);
 
   useEffect(() => {
     setCurrentClient(client);
@@ -300,28 +307,49 @@ export function EditClientForm({
                   )}
                 />
                  <div className="grid grid-cols-5 gap-4">
-                    <FormField
+                     <FormField
                         control={form.control}
-                        name="address.cidade"
+                        name="address.estado"
                         render={({ field }) => (
-                        <FormItem className="col-span-3">
-                            <FormLabel>Cidade</FormLabel>
-                            <FormControl>
-                            <Input placeholder="São Paulo" {...field} />
-                            </FormControl>
+                        <FormItem className="col-span-2">
+                            <FormLabel>Estado</FormLabel>
+                             <Select onValueChange={(value) => {
+                                field.onChange(value)
+                                form.setValue('address.cidade', '');
+                             }} defaultValue={field.value}>
+                                <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="UF" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                    {states.map(state => (
+                                        <SelectItem key={state.sigla} value={state.sigla}>{state.sigla}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                             <FormMessage />
                         </FormItem>
                         )}
                     />
                     <FormField
                         control={form.control}
-                        name="address.estado"
+                        name="address.cidade"
                         render={({ field }) => (
-                        <FormItem className="col-span-2">
-                            <FormLabel>Estado</FormLabel>
-                            <FormControl>
-                            <Input placeholder="SP" {...field} />
-                            </FormControl>
+                        <FormItem className="col-span-3">
+                            <FormLabel>Cidade</FormLabel>
+                             <Select onValueChange={field.onChange} value={field.value} disabled={!selectedState}>
+                                <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Selecione a cidade" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                     {cities.map(city => (
+                                        <SelectItem key={city} value={city}>{city}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                             <FormMessage />
                         </FormItem>
                         )}
@@ -487,3 +515,5 @@ export function EditClientForm({
     </Dialog>
   );
 }
+
+    
