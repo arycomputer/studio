@@ -143,8 +143,8 @@ export function EditClientForm({
             if ('logradouro' in result) {
               form.setValue('address.logradouro', result.logradouro || '');
               form.setValue('address.bairro', result.bairro || '');
-              form.setValue('address.estado', result.estado || '');
               form.setValue('address.cidade', result.cidade || '');
+              form.setValue('address.estado', result.estado || '');
               form.setFocus('address.numero');
             } else {
                 toast({
