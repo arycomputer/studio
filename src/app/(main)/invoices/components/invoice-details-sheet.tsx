@@ -41,6 +41,13 @@ const formSchema = z.object({
   status: z.enum(['paid', 'pending', 'overdue', 'written-off']),
 });
 
+const statusTranslations: { [key: string]: string } = {
+  paid: 'Paga',
+  pending: 'Pendente',
+  overdue: 'Atrasada',
+  'written-off': 'Baixada',
+};
+
 type InvoiceDetailsSheetProps = {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
@@ -144,7 +151,7 @@ export function InvoiceDetailsSheet({
               }
               className="capitalize"
             >
-              {invoice.status}
+              {statusTranslations[invoice.status]}
             </Badge>
           </div>
           <div className="flex justify-between items-center">

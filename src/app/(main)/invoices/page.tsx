@@ -49,6 +49,13 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useRouter, useSearchParams } from 'next/navigation';
 
+const statusTranslations: { [key: string]: string } = {
+  paid: 'Paga',
+  pending: 'Pendente',
+  overdue: 'Atrasada',
+  'written-off': 'Baixada',
+};
+
 function InvoicesPageContent() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
@@ -260,7 +267,7 @@ function InvoicesPageContent() {
                         }
                         className="capitalize"
                       >
-                        {invoice.status}
+                        {statusTranslations[invoice.status]}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">

@@ -24,6 +24,14 @@ import { getInvoices, getClients } from '@/app/actions';
 import { RevenueChart } from './components/revenue-chart';
 import { RevenueReportGenerator } from './components/revenue-report-generator';
 
+const statusTranslations: { [key: string]: string } = {
+  paid: 'Paga',
+  pending: 'Pendente',
+  overdue: 'Atrasada',
+  'written-off': 'Baixada',
+};
+
+
 export default async function DashboardPage() {
   const invoices = await getInvoices();
   const clients = await getClients();
@@ -144,7 +152,7 @@ export default async function DashboardPage() {
                             }
                             className="capitalize"
                         >
-                            {invoice.status}
+                            {statusTranslations[invoice.status]}
                         </Badge>
                         </TableCell>
                         <TableCell className="text-right">
