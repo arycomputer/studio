@@ -295,10 +295,10 @@ export function EditClientForm({
             Atualize os detalhes do cliente abaixo.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex-1 overflow-hidden">
-          <ScrollArea className="h-full -mr-6 pr-6">
+        <div className="flex-1 overflow-auto -mr-6 pr-6">
+          <ScrollArea className="h-full pr-1">
             <Form {...form}>
-              <form id="edit-client-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4 pr-1">
+              <form id="edit-client-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
                  <FormField
                     control={form.control}
                     name="photo"
@@ -307,8 +307,8 @@ export function EditClientForm({
                         <FormLabel>Foto do Cliente</FormLabel>
                         <div className="flex items-center gap-4">
                              <Avatar className="h-20 w-20">
-                                <AvatarImage src={photoPreview || ''} alt="Foto do cliente" />
-                                <AvatarFallback>{client.name?.charAt(0)}</AvatarFallback>
+                                <AvatarImage src={photoPreview || undefined} alt="Foto do cliente" />
+                                <AvatarFallback>{getInitials(client.name)}</AvatarFallback>
                             </Avatar>
                             <div className="flex flex-col gap-2">
                                 <FormControl>
@@ -316,7 +316,18 @@ export function EditClientForm({
                                     type="file" 
                                     accept="image/*"
                                     className='max-w-48'
-                                    onChange={(e) => field.onChange(e.target.files)}
+                                    onChange={(e) => {
+                                      field.onChange(e.target.files)
+                                      if (e.target.files && e.target.files[0]) {
+                                        const file = e.target.files[0];
+                                        const reader = new FileReader();
+                                        reader.onloadend = () => {
+                                          setPhotoPreview(reader.result as string);
+                                          setIsPhotoRemoved(false);
+                                        };
+                                        reader.readAsDataURL(file);
+                                      }
+                                    }}
                                 />
                                 </FormControl>
                                 {photoPreview &&
@@ -639,3 +650,5 @@ export function EditClientForm({
     </Dialog>
   );
 }
+
+    

@@ -139,9 +139,9 @@ export function InvoiceDetailsSheet({
           </SheetDescription>
         </SheetHeader>
         <div className="flex-1 overflow-auto -mr-6 pr-6">
-            <ScrollArea className='h-full'>
-              <div className="pr-1">
-                <div className="mt-8 space-y-6">
+            <ScrollArea className='h-full pr-1'>
+              <div className="py-4">
+                <div className="space-y-6">
                 <div className="flex justify-between items-center">
                     <span className="font-medium text-muted-foreground">Status</span>
                     <Badge
