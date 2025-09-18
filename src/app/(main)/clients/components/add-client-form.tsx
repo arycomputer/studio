@@ -32,6 +32,7 @@ import Image from 'next/image';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { states } from '@/lib/brazil-data';
 import { cn } from '@/lib/utils';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const formSchema = z.object({
   name: z.string().min(2, 'O nome deve ter pelo menos 2 caracteres.'),
@@ -191,13 +192,14 @@ export function AddClientForm({
         }
         onOpenChange(open);
     }}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Adicionar Novo Cliente</DialogTitle>
           <DialogDescription>
             Preencha os detalhes abaixo para adicionar um novo cliente.
           </DialogDescription>
         </DialogHeader>
+        <ScrollArea className="pr-6 -mr-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -453,7 +455,7 @@ export function AddClientForm({
                 </FormItem>
               )}
             />
-            <DialogFooter>
+            <DialogFooter className="sticky bottom-0 bg-background pt-4">
               <Button
                 type="button"
                 variant="outline"
@@ -473,6 +475,7 @@ export function AddClientForm({
             </DialogFooter>
           </form>
         </Form>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );

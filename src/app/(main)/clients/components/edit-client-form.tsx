@@ -32,6 +32,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { states } from '@/lib/brazil-data';
 import { cn } from '@/lib/utils';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const formSchema = z.object({
   name: z.string().min(2, 'O nome deve ter pelo menos 2 caracteres.'),
@@ -214,13 +215,14 @@ export function EditClientForm({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Editar Cliente</DialogTitle>
           <DialogDescription>
             Atualize os detalhes do cliente abaixo.
           </DialogDescription>
         </DialogHeader>
+        <ScrollArea className="pr-6 -mr-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
              <FormField
@@ -529,7 +531,7 @@ export function EditClientForm({
               </FormControl>
             </div>
 
-            <DialogFooter>
+            <DialogFooter className="sticky bottom-0 bg-background pt-4">
               <Button
                 type="button"
                 variant="outline"
@@ -547,6 +549,7 @@ export function EditClientForm({
             </DialogFooter>
           </form>
         </Form>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );
