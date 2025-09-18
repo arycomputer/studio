@@ -55,7 +55,7 @@ export default async function DashboardPage() {
   return (
     <div className="flex flex-col gap-8">
       <h1 className="text-3xl font-headline font-bold">Painel</h1>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Link href="/invoices?status=paid">
             <Card className="hover:bg-muted/50 transition-colors">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -143,26 +143,28 @@ export default async function DashboardPage() {
                     </CardHeader>
                     <CardContent>
                     {dueToday.length > 0 ? (
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                <TableHead>Cliente</TableHead>
-                                <TableHead className="text-right">Valor</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {dueToday.map((invoice) => (
-                                <TableRow key={invoice.id}>
-                                    <TableCell className='py-2'>
-                                    <div className="font-medium">{invoice.clientName}</div>
-                                    </TableCell>
-                                    <TableCell className="text-right py-2">
-                                    ${invoice.amount.toLocaleString()}
-                                    </TableCell>
-                                </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
+                        <div className="overflow-x-auto">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                    <TableHead>Cliente</TableHead>
+                                    <TableHead className="text-right">Valor</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {dueToday.map((invoice) => (
+                                    <TableRow key={invoice.id}>
+                                        <TableCell className='py-2'>
+                                        <div className="font-medium">{invoice.clientName}</div>
+                                        </TableCell>
+                                        <TableCell className="text-right py-2">
+                                        ${invoice.amount.toLocaleString()}
+                                        </TableCell>
+                                    </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
                         ) : (
                         <p className="text-sm text-muted-foreground">Nenhuma fatura vence hoje.</p>
                         )}
@@ -177,44 +179,46 @@ export default async function DashboardPage() {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <Table>
-                <TableHeader>
-                    <TableRow>
-                    <TableHead>Cliente</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Valor</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {recentInvoices.map((invoice) => (
-                    <TableRow key={invoice.id}>
-                        <TableCell>
-                        <div className="font-medium">{invoice.clientName}</div>
-                        <div className="text-sm text-muted-foreground">
-                            {invoice.clientEmail}
-                        </div>
-                        </TableCell>
-                        <TableCell>
-                        <Badge
-                            variant={
-                            invoice.status === 'paid'
-                                ? 'default'
-                                : invoice.status === 'overdue'
-                                ? 'destructive'
-                                : 'secondary'
-                            }
-                            className="capitalize"
-                        >
-                            {statusTranslations[invoice.status]}
-                        </Badge>
-                        </TableCell>
-                        <TableCell className="text-right">
-                        ${invoice.amount.toLocaleString()}
-                        </TableCell>
-                    </TableRow>
-                    ))}
-                </TableBody>
-                </Table>
+                <div className="overflow-x-auto">
+                    <Table>
+                    <TableHeader>
+                        <TableRow>
+                        <TableHead>Cliente</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="text-right">Valor</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {recentInvoices.map((invoice) => (
+                        <TableRow key={invoice.id}>
+                            <TableCell>
+                            <div className="font-medium">{invoice.clientName}</div>
+                            <div className="text-sm text-muted-foreground truncate max-w-[120px] sm:max-w-none">
+                                {invoice.clientEmail}
+                            </div>
+                            </TableCell>
+                            <TableCell>
+                            <Badge
+                                variant={
+                                invoice.status === 'paid'
+                                    ? 'default'
+                                    : invoice.status === 'overdue'
+                                    ? 'destructive'
+                                    : 'secondary'
+                                }
+                                className="capitalize"
+                            >
+                                {statusTranslations[invoice.status]}
+                            </Badge>
+                            </TableCell>
+                            <TableCell className="text-right">
+                            ${invoice.amount.toLocaleString()}
+                            </TableCell>
+                        </TableRow>
+                        ))}
+                    </TableBody>
+                    </Table>
+                </div>
             </CardContent>
             </Card>
         </div>
