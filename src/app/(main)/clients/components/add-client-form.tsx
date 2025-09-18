@@ -25,9 +25,11 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { addClient } from '@/app/actions';
 import { useState } from 'react';
-import { Loader2, Trash2 } from 'lucide-react';
+import { Loader2, Trash2, X, File as FileIcon } from 'lucide-react';
 import type { Client } from '@/lib/types';
 import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent } from '@/components/ui/card';
+import Image from 'next/image';
 
 const formSchema = z.object({
   name: z.string().min(2, 'O nome deve ter pelo menos 2 caracteres.'),
@@ -43,6 +45,8 @@ type AddClientFormProps = {
   onOpenChange: (isOpen: boolean) => void;
   onClientAdded: (client: Client) => void;
 };
+
+const isImageFile = (file: File) => file.type.startsWith('image/');
 
 export function AddClientForm({
   isOpen,
@@ -66,7 +70,11 @@ export function AddClientForm({
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
-      setFiles(Array.from(event.target.files));
+      setFiles((prevFiles) => [...prevFiles, ...Array.from(event.target.files!)]);
+    }
+     // Reset the input value to allow selecting the same file again
+    if(event.target){
+      event.target.value = '';
     }
   };
 
@@ -190,28 +198,67 @@ export function AddClientForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Documentos</FormLabel>
-                  <FormControl>
-                    <Input 
-                      type="file" 
-                      multiple
-                      onChange={handleFileChange}
-                    />
+                   <FormControl>
+                     <Button type="button" variant="outline" asChild>
+                        <label htmlFor="file-upload" className="cursor-pointer w-full">
+                           Adicionar Arquivos...
+                           <Input 
+                              id="file-upload"
+                              type="file" 
+                              multiple
+                              onChange={handleFileChange}
+                              className="sr-only"
+                           />
+                        </label>
+                     </Button>
                   </FormControl>
                   <FormMessage />
+                  
                    {files && files.length > 0 && (
-                    <div className="text-sm text-muted-foreground mt-2">
-                        <p className="font-medium">Arquivos selecionados:</p>
-                        <ul className='space-y-1 mt-1'>
-                        {files.map((file, index) => (
-                            <li key={index} className='flex items-center justify-between'>
-                                <span>- {file.name}</span>
-                                <Button type="button" variant="ghost" size="icon" className='h-6 w-6' onClick={() => removeFile(index)}>
-                                    <Trash2 className="h-4 w-4 text-destructive" />
+                      <div className="space-y-2">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                          {files.map((file, index) => (
+                            isImageFile(file) ? (
+                              <Card key={index} className="relative group">
+                                <CardContent className="p-0">
+                                  <Image
+                                    src={URL.createObjectURL(file)}
+                                    alt={file.name}
+                                    width={100}
+                                    height={100}
+                                    className="w-full h-24 object-cover rounded-md"
+                                  />
+                                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                </CardContent>
+                                <Button
+                                  type="button"
+                                  variant="destructive"
+                                  size="icon"
+                                  className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  onClick={() => removeFile(index)}
+                                >
+                                  <X className="h-4 w-4" />
                                 </Button>
-                            </li>
-                        ))}
+                              </Card>
+                            ) : null
+                          ))}
+                        </div>
+                        <ul className='text-sm text-muted-foreground space-y-1 pt-2'>
+                          {files.map((file, index) => (
+                            !isImageFile(file) ? (
+                              <li key={index} className='flex items-center justify-between bg-muted p-1 rounded-md'>
+                                  <div className="flex items-center gap-2 truncate">
+                                    <FileIcon className="h-4 w-4 flex-shrink-0" />
+                                    <span className="truncate">{file.name}</span>
+                                  </div>
+                                  <Button type="button" variant="ghost" size="icon" className='h-6 w-6 flex-shrink-0' onClick={() => removeFile(index)}>
+                                      <Trash2 className="h-4 w-4 text-destructive" />
+                                  </Button>
+                              </li>
+                            ) : null
+                          ))}
                         </ul>
-                    </div>
+                      </div>
                     )}
                 </FormItem>
               )}
@@ -238,5 +285,3 @@ export function AddClientForm({
     </Dialog>
   );
 }
-
-    
