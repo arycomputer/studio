@@ -131,15 +131,16 @@ export function InvoiceDetailsSheet({
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
-      <SheetContent className="sm:max-w-lg flex flex-col">
+      <SheetContent className="sm:max-w-lg flex flex-col max-h-[100svh]">
         <SheetHeader>
           <SheetTitle>Detalhes da Fatura</SheetTitle>
           <SheetDescription>
             Veja e edite os detalhes da fatura #{invoice.id}.
           </SheetDescription>
         </SheetHeader>
-        <ScrollArea className="flex-1 -mr-6 pr-6">
-            <div className="py-4 pr-1">
+        <div className="flex-1 overflow-y-auto -mx-6 px-6">
+          <ScrollArea className="h-full pr-2">
+            <div className="py-4">
               <div className="space-y-6">
               <div className="flex justify-between items-center">
                   <span className="font-medium text-muted-foreground">Status</span>
@@ -223,8 +224,9 @@ export function InvoiceDetailsSheet({
               </form>
               </Form>
             </div>
-        </ScrollArea>
-        <SheetFooter className="border-t pt-4">
+          </ScrollArea>
+        </div>
+        <SheetFooter className="border-t pt-4 -mx-6 px-6">
             <Button
                 type="button"
                 variant="outline"
