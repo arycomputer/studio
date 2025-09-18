@@ -76,6 +76,14 @@ export async function addClient(client: Omit<Client, 'id' | 'avatarUrl' | 'docum
   return newClient;
 }
 
+async function fileToDataUri(file: File): Promise<string> {
+  const arrayBuffer = await file.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+  const base64 = buffer.toString('base64');
+  return `data:${file.type};base64,${base64}`;
+}
+
+
 export async function updateClient(id: string, data: Omit<Client, 'id' | 'avatarUrl' | 'documents' | 'address'> & { address?: ClientAddress, newDocuments?: File[], photo?: File }): Promise<Client> {
   await delay(500);
   const clientIndex = mockClients.findIndex(c => c.id === id);
@@ -94,8 +102,9 @@ export async function updateClient(id: string, data: Omit<Client, 'id' | 'avatar
   let avatarUrl = existingClient.avatarUrl;
   if (data.photo) {
     // In a real app, you would upload the file to a storage service
-    // and get a URL. Here, we'll just simulate it.
-    avatarUrl = `/photos/${id}/${data.photo.name}`;
+    // and get a URL. Here, we'll convert to a data URI to simulate
+    // an immediate update.
+    avatarUrl = await fileToDataUri(data.photo);
   }
 
 
