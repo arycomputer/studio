@@ -17,7 +17,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { PlusCircle, X } from 'lucide-react';
-import type { Invoice, Client } from '@/lib/types';
+import type { Invoice, Client, InvoiceStatus } from '@/lib/types';
 import { AddInvoiceForm } from './components/add-invoice-form';
 import { InvoiceDetailsSheet } from './components/invoice-details-sheet';
 import { useToast } from '@/hooks/use-toast';
@@ -35,6 +35,14 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { DataTable } from '@/components/data-table/data-table';
 import { getColumns } from './components/columns';
 import type { ColumnDef } from '@tanstack/react-table';
+import { format } from 'date-fns';
+
+const statusTranslations: { [key: string]: string } = {
+    paid: 'Pagas',
+    pending: 'Pendentes',
+    overdue: 'Atrasadas',
+    'pending,overdue': 'Pendentes e Atrasadas'
+};
 
 function InvoicesPageContent() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -47,8 +55,12 @@ function InvoicesPageContent() {
   const { toast } = useToast();
   const searchParams = useSearchParams();
   const router = useRouter();
+  const {pathname} = useRouter();
 
   const clientId = searchParams.get('clientId');
+  const filterStatus = searchParams.get('status');
+  const filterDueDate = searchParams.get('dueDate');
+
   const filteredClient = useMemo(() => {
     return clients.find((c) => c.id === clientId);
   }, [clients, clientId]);
@@ -68,11 +80,35 @@ function InvoicesPageContent() {
   }, []);
 
   const filteredInvoices = useMemo(() => {
+    let filtered = [...invoices];
     if (clientId) {
-      return invoices.filter((invoice) => invoice.clientId === clientId);
+        filtered = filtered.filter((invoice) => invoice.clientId === clientId);
     }
-    return invoices;
-  }, [invoices, clientId]);
+    if (filterStatus) {
+        const statuses = filterStatus.split(',') as InvoiceStatus[];
+        filtered = filtered.filter((invoice) => statuses.includes(invoice.status));
+    }
+    if (filterDueDate === 'today') {
+        const today = format(new Date(), 'yyyy-MM-dd');
+        filtered = filtered.filter((invoice) => invoice.dueDate === today);
+    }
+    return filtered;
+  }, [invoices, clientId, filterStatus, filterDueDate]);
+
+  const getFilterDescription = () => {
+    if(clientId) {
+        return <>para o cliente: <span className="font-semibold">{filteredClient?.name}</span></>;
+    }
+    if(filterStatus) {
+        const translated = statusTranslations[filterStatus] || filterStatus;
+        return <>com status: <span className="font-semibold">{translated}</span></>;
+    }
+    if(filterDueDate === 'today') {
+        return <>com <span className="font-semibold">vencimento hoje</span></>;
+    }
+    return '';
+  }
+
 
   const handleInvoiceAdded = (newInvoice: Invoice) => {
     setInvoices((prevInvoices) => [newInvoice, ...prevInvoices]);
@@ -157,11 +193,10 @@ function InvoicesPageContent() {
         </Button>
       </div>
 
-      {filteredClient && (
+      {(clientId || filterStatus || filterDueDate) && (
         <div className="flex items-center gap-2 rounded-lg border bg-secondary/50 p-3">
           <span className="text-sm">
-            Mostrando faturas para o cliente:{' '}
-            <span className="font-semibold">{filteredClient.name}</span>
+            Mostrando faturas {getFilterDescription()}
           </span>
           <Button
             variant="ghost"

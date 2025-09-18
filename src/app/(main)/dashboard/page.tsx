@@ -25,6 +25,7 @@ import {
 import { getInvoices, getClients } from '@/app/actions';
 import { RevenueChart } from './components/revenue-chart';
 import { format } from 'date-fns';
+import Link from 'next/link';
 
 const statusTranslations: { [key: string]: string } = {
   paid: 'Paga',
@@ -55,60 +56,68 @@ export default async function DashboardPage() {
     <div className="flex flex-col gap-8">
       <h1 className="text-3xl font-headline font-bold">Painel</h1>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Receita Total</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              ${totalRevenue.toLocaleString()}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Receita de todos os tempos de faturas pagas.
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Receita Pendente
-            </CardTitle>
-            <CreditCard className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              ${outstandingRevenue.toLocaleString()}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              De faturas pendentes e vencidas.
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Clientes</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">+{clients.length}</div>
-            <p className="text-xs text-muted-foreground">
-              Número total de clientes gerenciados.
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Faturas Totais</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{invoices.length}</div>
-            <p className="text-xs text-muted-foreground">
-              Total de faturas geradas.
-            </p>
-          </CardContent>
-        </Card>
+        <Link href="/invoices?status=paid">
+            <Card className="hover:bg-muted/50 transition-colors">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Receita Total</CardTitle>
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+                <div className="text-2xl font-bold">
+                ${totalRevenue.toLocaleString()}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                Receita de todos os tempos de faturas pagas.
+                </p>
+            </CardContent>
+            </Card>
+        </Link>
+        <Link href="/invoices?status=pending,overdue">
+            <Card className="hover:bg-muted/50 transition-colors">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                Receita Pendente
+                </CardTitle>
+                <CreditCard className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+                <div className="text-2xl font-bold">
+                ${outstandingRevenue.toLocaleString()}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                De faturas pendentes e vencidas.
+                </p>
+            </CardContent>
+            </Card>
+        </Link>
+        <Link href="/clients">
+            <Card className="hover:bg-muted/50 transition-colors">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Clientes</CardTitle>
+                <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+                <div className="text-2xl font-bold">+{clients.length}</div>
+                <p className="text-xs text-muted-foreground">
+                Número total de clientes gerenciados.
+                </p>
+            </CardContent>
+            </Card>
+        </Link>
+        <Link href="/invoices">
+            <Card className="hover:bg-muted/50 transition-colors">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Faturas Totais</CardTitle>
+                <Activity className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+                <div className="text-2xl font-bold">{invoices.length}</div>
+                <p className="text-xs text-muted-foreground">
+                Total de faturas geradas.
+                </p>
+            </CardContent>
+            </Card>
+        </Link>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-7">
@@ -121,43 +130,45 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
         <div className="lg:col-span-3 flex flex-col gap-4">
-            <Card>
-                <CardHeader>
-                    <CardTitle className="font-headline flex items-center gap-2">
-                        <AlertTriangle className="h-5 w-5 text-destructive" />
-                        Vencimentos do Dia
-                    </CardTitle>
-                    <CardDescription>
-                        Faturas que precisam de atenção imediata.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                {dueToday.length > 0 ? (
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                            <TableHead>Cliente</TableHead>
-                            <TableHead className="text-right">Valor</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {dueToday.map((invoice) => (
-                            <TableRow key={invoice.id}>
-                                <TableCell className='py-2'>
-                                <div className="font-medium">{invoice.clientName}</div>
-                                </TableCell>
-                                <TableCell className="text-right py-2">
-                                ${invoice.amount.toLocaleString()}
-                                </TableCell>
-                            </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                    ) : (
-                    <p className="text-sm text-muted-foreground">Nenhuma fatura vence hoje.</p>
-                    )}
-                </CardContent>
-            </Card>
+            <Link href="/invoices?dueDate=today">
+                <Card className="hover:bg-muted/50 transition-colors">
+                    <CardHeader>
+                        <CardTitle className="font-headline flex items-center gap-2">
+                            <AlertTriangle className="h-5 w-5 text-destructive" />
+                            Vencimentos do Dia
+                        </CardTitle>
+                        <CardDescription>
+                            Faturas que precisam de atenção imediata.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                    {dueToday.length > 0 ? (
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                <TableHead>Cliente</TableHead>
+                                <TableHead className="text-right">Valor</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {dueToday.map((invoice) => (
+                                <TableRow key={invoice.id}>
+                                    <TableCell className='py-2'>
+                                    <div className="font-medium">{invoice.clientName}</div>
+                                    </TableCell>
+                                    <TableCell className="text-right py-2">
+                                    ${invoice.amount.toLocaleString()}
+                                    </TableCell>
+                                </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                        ) : (
+                        <p className="text-sm text-muted-foreground">Nenhuma fatura vence hoje.</p>
+                        )}
+                    </CardContent>
+                </Card>
+            </Link>
             <Card>
             <CardHeader>
                 <CardTitle className="font-headline">Faturas Recentes</CardTitle>
