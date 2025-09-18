@@ -185,6 +185,21 @@ export function AddClientForm({
     form.setValue('phone', formattedValue);
   };
 
+  const handleCepChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    let formattedValue = value.replace(/\D/g, '');
+    
+    if (formattedValue.length > 8) {
+      formattedValue = formattedValue.substring(0, 8);
+    }
+    
+    if (formattedValue.length > 5) {
+      formattedValue = formattedValue.replace(/(\d{5})(\d)/, '$1-$2');
+    }
+
+    form.setValue('address.cep', formattedValue);
+  };
+
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
@@ -277,7 +292,7 @@ export function AddClientForm({
                           <FormLabel>CEP</FormLabel>
                           <FormControl>
                              <div className="relative">
-                               <Input placeholder="00000-000" {...field} />
+                               <Input placeholder="00000-000" {...field} onChange={handleCepChange} />
                                {isFetchingCep && (
                                 <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                                     <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
@@ -506,4 +521,5 @@ export function AddClientForm({
   );
 }
 
+    
     

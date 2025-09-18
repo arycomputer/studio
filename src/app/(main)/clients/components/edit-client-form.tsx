@@ -215,6 +215,21 @@ export function EditClientForm({
     form.setValue('phone', formattedValue);
   };
 
+  const handleCepChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    let formattedValue = value.replace(/\D/g, '');
+    
+    if (formattedValue.length > 8) {
+      formattedValue = formattedValue.substring(0, 8);
+    }
+    
+    if (formattedValue.length > 5) {
+      formattedValue = formattedValue.replace(/(\d{5})(\d)/, '$1-$2');
+    }
+
+    form.setValue('address.cep', formattedValue);
+  };
+
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
@@ -247,7 +262,7 @@ export function EditClientForm({
             Atualize os detalhes do cliente abaixo.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex-1 overflow-y-auto pr-6 -mr-6">
+        <ScrollArea className="pr-6 -mr-6">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
@@ -301,7 +316,7 @@ export function EditClientForm({
                             <FormLabel>CEP</FormLabel>
                             <FormControl>
                               <div className="relative">
-                                <Input placeholder="00000-000" {...field} value={field.value ?? ''} />
+                                <Input placeholder="00000-000" {...field} value={field.value ?? ''} onChange={handleCepChange} />
                                 {isFetchingCep && (
                                   <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                                       <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
@@ -573,8 +588,10 @@ export function EditClientForm({
               </DialogFooter>
             </form>
           </Form>
-        </div>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );
 }
+
+    
