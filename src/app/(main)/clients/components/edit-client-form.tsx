@@ -34,7 +34,16 @@ import { Card, CardContent } from '@/components/ui/card';
 const formSchema = z.object({
   name: z.string().min(2, 'O nome deve ter pelo menos 2 caracteres.'),
   email: z.string().email('Por favor, insira um e-mail válido.'),
-  phone: z.string().optional(),
+  phone: z.string().optional().refine(
+    (value) => {
+      if (!value) return true; // Optional field
+      const numericValue = value.replace(/\D/g, '');
+      return numericValue.length === 10 || numericValue.length === 11;
+    },
+    {
+      message: 'O número de celular deve ter 10 ou 11 dígitos (com DDD).',
+    }
+  ),
   address: z.string().optional(),
   rate: z.coerce
     .number({ invalid_type_error: 'A taxa deve ser um número.' })
