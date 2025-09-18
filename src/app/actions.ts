@@ -2,7 +2,7 @@
 'use server';
 
 import { invoices as mockInvoices, clients as mockClients } from '@/lib/data';
-import { Client, Invoice, InvoiceStatus, ClientDocument } from '@/lib/types';
+import { Client, Invoice, InvoiceStatus, ClientDocument, ClientAddress } from '@/lib/types';
 import {format} from 'date-fns';
 
 // Simulate a delay to mimic real-world network latency
@@ -28,7 +28,7 @@ export async function getClients(): Promise<Client[]> {
   return mockClients;
 }
 
-export async function addClient(client: Omit<Client, 'id' | 'avatarUrl' | 'documents'> & { documents?: File[] }): Promise<Client> {
+export async function addClient(client: Omit<Client, 'id' | 'avatarUrl' | 'documents' | 'address'> & { address?: ClientAddress, documents?: File[] }): Promise<Client> {
   await delay(500);
   const newId = (mockClients.length + 1).toString();
   
@@ -52,7 +52,7 @@ export async function addClient(client: Omit<Client, 'id' | 'avatarUrl' | 'docum
   return newClient;
 }
 
-export async function updateClient(id: string, data: Omit<Client, 'id' | 'avatarUrl' | 'documents'> & { newDocuments?: File[] }): Promise<Client> {
+export async function updateClient(id: string, data: Omit<Client, 'id' | 'avatarUrl' | 'documents' | 'address'> & { address?: ClientAddress, newDocuments?: File[] }): Promise<Client> {
   await delay(500);
   const clientIndex = mockClients.findIndex(c => c.id === id);
   if (clientIndex === -1) {

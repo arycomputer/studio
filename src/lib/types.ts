@@ -4,6 +4,16 @@ export type ClientDocument = {
   url: string;
 }
 
+export type ClientAddress = {
+  cep?: string;
+  logradouro?: string;
+  numero?: string;
+  bairro?: string;
+  referencia?: string;
+  cidade?: string;
+  estado?: string;
+}
+
 export type Client = {
   id: string;
   name: string;
@@ -12,7 +22,7 @@ export type Client = {
   phone?: string;
   rate?: number;
   documents?: ClientDocument[];
-  address?: string;
+  address?: ClientAddress;
 };
 
 export type InvoiceStatus = 'paid' | 'pending' | 'overdue' | 'written-off';

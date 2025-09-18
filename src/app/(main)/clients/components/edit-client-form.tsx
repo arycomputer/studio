@@ -44,7 +44,21 @@ const formSchema = z.object({
       message: 'O número de celular deve ter 10 ou 11 dígitos (com DDD).',
     }
   ),
-  address: z.string().optional(),
+  address: z.object({
+    cep: z.string().optional().refine(
+        (value) => {
+            if(!value) return true;
+            return /^\d{8}$/.test(value.replace(/\D/g, ''));
+        },
+        'CEP inválido. Deve conter 8 dígitos.'
+    ),
+    logradouro: z.string().optional(),
+    numero: z.string().optional(),
+    bairro: z.string().optional(),
+    referencia: z.string().optional(),
+    cidade: z.string().optional(),
+    estado: z.string().optional(),
+  }).optional(),
   rate: z.coerce
     .number({ invalid_type_error: 'A taxa deve ser um número.' })
     .positive('A taxa de juros deve ser um número positivo.')
@@ -80,7 +94,7 @@ export function EditClientForm({
       name: client.name,
       email: client.email,
       phone: client.phone || '',
-      address: client.address || '',
+      address: client.address || {},
       rate: client.rate || 0,
     },
   });
@@ -91,7 +105,15 @@ export function EditClientForm({
       name: client.name,
       email: client.email,
       phone: client.phone || '',
-      address: client.address || '',
+      address: client.address || {
+        cep: '',
+        logradouro: '',
+        numero: '',
+        bairro: '',
+        referencia: '',
+        cidade: '',
+        estado: '',
+      },
       rate: client.rate || 0,
     });
     setNewFiles([]);
@@ -205,23 +227,108 @@ export function EditClientForm({
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="address"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Endereço</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="123 Main St, Anytown, USA"
-                      className="resize-none"
-                      {...field}
+            
+            <div className="space-y-4 rounded-md border p-4">
+                 <h3 className="text-sm font-medium">Endereço</h3>
+                 <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="address.cep"
+                      render={({ field }) => (
+                        <FormItem className="col-span-1">
+                          <FormLabel>CEP</FormLabel>
+                          <FormControl>
+                            <Input placeholder="00000-000" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                 </div>
+                 <FormField
+                  control={form.control}
+                  name="address.logradouro"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Logradouro</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Rua Principal" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="grid grid-cols-2 gap-4">
+                     <FormField
+                      control={form.control}
+                      name="address.numero"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Número</FormLabel>
+                          <FormControl>
+                            <Input placeholder="123" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                     <FormField
+                      control={form.control}
+                      name="address.bairro"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Bairro</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Centro" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                </div>
+                 <FormField
+                  control={form.control}
+                  name="address.referencia"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Referência</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Próximo ao parque" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <div className="grid grid-cols-5 gap-4">
+                    <FormField
+                        control={form.control}
+                        name="address.cidade"
+                        render={({ field }) => (
+                        <FormItem className="col-span-3">
+                            <FormLabel>Cidade</FormLabel>
+                            <FormControl>
+                            <Input placeholder="São Paulo" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="address.estado"
+                        render={({ field }) => (
+                        <FormItem className="col-span-2">
+                            <FormLabel>Estado</FormLabel>
+                            <FormControl>
+                            <Input placeholder="SP" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                </div>
+            </div>
+
             <FormField
               control={form.control}
               name="rate"

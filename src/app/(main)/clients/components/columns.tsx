@@ -27,6 +27,19 @@ type GetColumnsProps = {
   onViewInvoices: (client: Client) => void;
 };
 
+const formatAddress = (address: Client['address']) => {
+    if (!address) return null;
+    const parts = [
+        address.logradouro,
+        address.numero,
+        address.bairro,
+        address.cidade,
+        address.estado,
+        address.cep,
+    ];
+    return parts.filter(Boolean).join(', ');
+}
+
 export const getColumns = ({
   onEdit,
   onDelete,
@@ -66,7 +79,7 @@ export const getColumns = ({
         <div>
           <div className="text-sm">{client.email}</div>
           <div className="text-sm text-muted-foreground">{client.phone}</div>
-          <div className="text-sm text-muted-foreground">{client.address}</div>
+          <div className="text-sm text-muted-foreground truncate max-w-xs">{formatAddress(client.address)}</div>
         </div>
       );
     },
