@@ -59,7 +59,11 @@ export function ProfileForm() {
       const file = photo[0];
       const reader = new FileReader();
       reader.onloadend = () => {
-        setPhotoPreview(reader.result as string);
+        const result = reader.result as string;
+        setPhotoPreview(result);
+        localStorage.setItem('user-photo', result);
+        // Disparar um evento para que outros componentes (como o user-nav) possam ouvir
+        window.dispatchEvent(new Event('storage'));
       };
       reader.readAsDataURL(file);
     }
@@ -76,7 +80,8 @@ export function ProfileForm() {
       title: 'Perfil atualizado!',
       description: 'Suas informações foram salvas com sucesso. Atualize a página para ver as mudanças no menu.',
     });
-    console.log(data);
+    // Disparar evento para atualizar o nome/email no nav
+    window.dispatchEvent(new Event('storage'));
   }
 
   return (

@@ -14,14 +14,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { CreditCard, LogOut, Settings, User } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 export function UserNav() {
   const [name, setName] = useState('Usuário');
   const [email, setEmail] = useState('usuario@exemplo.com');
   const [photo, setPhoto] = useState('https://picsum.photos/seed/10/40/40');
 
-  useEffect(() => {
+  const updateUserData = useCallback(() => {
     const storedName = localStorage.getItem('user-name');
     const storedEmail = localStorage.getItem('user-email');
     const storedPhoto = localStorage.getItem('user-photo');
@@ -29,6 +29,20 @@ export function UserNav() {
     if (storedEmail) setEmail(storedEmail);
     if (storedPhoto) setPhoto(storedPhoto);
   }, []);
+
+  useEffect(() => {
+    updateUserData();
+
+    const handleStorageChange = () => {
+      updateUserData();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [updateUserData]);
 
   return (
     <DropdownMenu>
