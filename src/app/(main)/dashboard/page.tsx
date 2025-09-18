@@ -22,7 +22,7 @@ import {
   Activity,
   AlertTriangle,
 } from 'lucide-react';
-import { getInvoices, getClients } from '@/app/actions';
+import { getInvoices, getClients } from '@/actions';
 import { RevenueChart } from './components/revenue-chart';
 import { format } from 'date-fns';
 import Link from 'next/link';

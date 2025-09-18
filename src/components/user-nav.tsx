@@ -35,7 +35,7 @@ export function UserNav() {
       setPhoto(storedPhoto);
     } else {
       const initials = getInitials(storedName);
-      setPhoto(`https://placehold.co/40x40/E2E8F0/475569?text=${initials}`);
+      setPhoto(`https://ui-avatars.com/api/?name=${initials}&background=E2E8F0&color=475569`);
     }
   }, []);
 
@@ -56,7 +56,7 @@ export function UserNav() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+        <Button variant="ghost" className="relative h-9 w-9 rounded-full">
           <Avatar className="h-9 w-9">
             <AvatarImage src={photo || ''} alt="@usuário" />
             <AvatarFallback>{name.charAt(0).toUpperCase()}</AvatarFallback>

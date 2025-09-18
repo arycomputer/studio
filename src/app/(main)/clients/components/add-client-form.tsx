@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { addClient, getAddressFromCEP } from '@/app/actions';
+import { addClient, getAddressFromCEP } from '@/actions';
 import { useState, useEffect } from 'react';
 import { Loader2, Trash2, X, File as FileIcon } from 'lucide-react';
 import type { Client } from '@/lib/types';
@@ -234,10 +234,10 @@ export function AddClientForm({
             Preencha os detalhes abaixo para adicionar um novo cliente.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex-1 overflow-y-auto -mx-6 px-6">
-          <ScrollArea className="h-full pr-2">
+        <div className="flex-1 overflow-hidden -mx-6 px-6">
+          <ScrollArea className="h-full pr-4">
             <Form {...form}>
-              <form id="add-client-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
+              <form id="add-client-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4 pr-2">
                 <FormField
                   control={form.control}
                   name="name"

@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { updateClient, deleteClientDocument, getAddressFromCEP } from '@/app/actions';
+import { updateClient, deleteClientDocument, getAddressFromCEP } from '@/actions';
 import { useState, useEffect } from 'react';
 import { Loader2, Trash2, Download, X, File as FileIcon, UserX } from 'lucide-react';
 import type { Client } from '@/lib/types';
@@ -108,7 +108,7 @@ export function EditClientForm({
 
   useEffect(() => {
     setCurrentClient(client);
-    setPhotoPreview(client.avatarUrl || `https://placehold.co/80x80/E2E8F0/475569?text=${getInitials(client.name)}`);
+    setPhotoPreview(client.avatarUrl || `https://ui-avatars.com/api/?name=${getInitials(client.name)}&background=E2E8F0&color=475569`);
     setIsPhotoRemoved(false);
     form.reset({
       name: client.name,
@@ -186,7 +186,7 @@ export function EditClientForm({
   
   const handleRemovePhoto = () => {
     const initials = getInitials(form.getValues('name'));
-    setPhotoPreview(`https://placehold.co/80x80/E2E8F0/475569?text=${initials}`);
+    setPhotoPreview(`https://ui-avatars.com/api/?name=${initials}&background=E2E8F0&color=475569`);
     form.setValue('photo', null);
     setIsPhotoRemoved(true);
   };
@@ -295,10 +295,10 @@ export function EditClientForm({
             Atualize os detalhes do cliente abaixo.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex-1 overflow-y-auto -mx-6 px-6">
-          <ScrollArea className="h-full pr-2">
+        <div className="flex-1 overflow-hidden -mx-6 px-6">
+          <ScrollArea className="h-full pr-4">
             <Form {...form}>
-              <form id="edit-client-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
+              <form id="edit-client-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4 pr-2">
                  <FormField
                     control={form.control}
                     name="photo"
@@ -307,7 +307,7 @@ export function EditClientForm({
                         <FormLabel>Foto do Cliente</FormLabel>
                         <div className="flex items-center gap-4">
                              <Avatar className="h-20 w-20">
-                                <AvatarImage src={photoPreview || `https://placehold.co/80x80/E2E8F0/475569?text=${getInitials(client.name)}`} alt="Foto do cliente" />
+                                <AvatarImage src={photoPreview || `https://ui-avatars.com/api/?name=${getInitials(client.name)}&background=E2E8F0&color=475569`} alt="Foto do cliente" />
                                 <AvatarFallback>{getInitials(client.name)}</AvatarFallback>
                             </Avatar>
                             <div className="flex flex-col gap-2">
@@ -330,7 +330,7 @@ export function EditClientForm({
                                     }}
                                 />
                                 </FormControl>
-                                {(photoPreview && !photoPreview.includes('placehold.co')) &&
+                                {(photoPreview && !photoPreview.includes('ui-avatars.com')) &&
                                     <Button type="button" variant="ghost" size="sm" className="text-destructive hover:text-destructive max-w-48" onClick={handleRemovePhoto}>
                                         <UserX className="mr-2 h-4 w-4" />
                                         Remover Foto

@@ -29,7 +29,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { updateInvoiceStatus } from '@/app/actions';
+import { updateInvoiceStatus } from '@/actions';
 import { useState, useEffect, useMemo } from 'react';
 import { Loader2 } from 'lucide-react';
 import type { Invoice, InvoiceStatus, Client } from '@/lib/types';
@@ -138,9 +138,9 @@ export function InvoiceDetailsSheet({
             Veja e edite os detalhes da fatura #{invoice.id}.
           </SheetDescription>
         </SheetHeader>
-        <div className="flex-1 overflow-y-auto -mx-6 px-6">
-          <ScrollArea className="h-full pr-2">
-            <div className="py-4">
+        <div className="flex-1 overflow-hidden -mx-6 px-6">
+          <ScrollArea className="h-full pr-4">
+            <div className="py-4 pr-2">
               <div className="space-y-6">
               <div className="flex justify-between items-center">
                   <span className="font-medium text-muted-foreground">Status</span>

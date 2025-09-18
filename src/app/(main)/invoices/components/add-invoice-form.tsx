@@ -36,7 +36,7 @@ import {
 } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { useToast } from '@/hooks/use-toast';
-import { addInvoice } from '@/app/actions';
+import { addInvoice } from '@/actions';
 import { useState } from 'react';
 import { CalendarIcon, Loader2 } from 'lucide-react';
 import type { Client, Invoice } from '@/lib/types';
@@ -111,10 +111,10 @@ export function AddInvoiceForm({
             Preencha os detalhes abaixo para criar uma nova fatura.
           </DialogDescription>
         </DialogHeader>
-        <div className='flex-1 overflow-y-auto -mx-6 px-6'>
-          <ScrollArea className="h-full pr-2">
+        <div className='flex-1 overflow-hidden -mx-6 px-6'>
+          <ScrollArea className="h-full pr-4">
             <Form {...form}>
-              <form id="add-invoice-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 py-4">
+              <form id="add-invoice-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 py-4 pr-2">
                 <FormField
                   control={form.control}
                   name="clientId"
