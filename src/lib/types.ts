@@ -7,6 +7,7 @@ export type Client = {
   phone?: string;
   rate?: number;
   documents?: { name: string; url: string }[];
+  address?: string;
 };
 
 export type InvoiceStatus = 'paid' | 'pending' | 'overdue' | 'written-off';

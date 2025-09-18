@@ -66,6 +66,7 @@ export const getColumns = ({
         <div>
           <div className="text-sm">{client.email}</div>
           <div className="text-sm text-muted-foreground">{client.phone}</div>
+          <div className="text-sm text-muted-foreground">{client.address}</div>
         </div>
       );
     },

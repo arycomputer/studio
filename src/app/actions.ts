@@ -34,6 +34,7 @@ export async function addClient(client: Omit<Client, 'id' | 'avatarUrl' | 'docum
     email: client.email,
     phone: client.phone,
     rate: client.rate,
+    address: client.address,
     id: newId,
     avatarUrl: `https://picsum.photos/seed/${newId}/40/40`,
     documents: uploadedDocuments,

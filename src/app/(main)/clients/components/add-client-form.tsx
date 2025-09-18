@@ -27,11 +27,13 @@ import { addClient } from '@/app/actions';
 import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import type { Client } from '@/lib/types';
+import { Textarea } from '@/components/ui/textarea';
 
 const formSchema = z.object({
   name: z.string().min(2, 'O nome deve ter pelo menos 2 caracteres.'),
   email: z.string().email('Por favor, insira um e-mail válido.'),
   phone: z.string().optional(),
+  address: z.string().optional(),
   rate: z.coerce.number().optional(),
   documents: z.any().optional(),
 });
@@ -56,6 +58,7 @@ export function AddClientForm({
       name: '',
       email: '',
       phone: '',
+      address: '',
       rate: 0,
     },
   });
@@ -130,6 +133,23 @@ export function AddClientForm({
                   <FormLabel>Celular</FormLabel>
                   <FormControl>
                     <Input placeholder="(99) 99999-9999" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="address"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Endereço</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="123 Main St, Anytown, USA"
+                      className="resize-none"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
