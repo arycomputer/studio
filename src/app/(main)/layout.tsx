@@ -72,7 +72,7 @@ export default function MainLayout({
           <SidebarFooter>
             <SidebarMenu>
               <SidebarMenuItem>
-                <Link href="#">
+                <Link href="/settings">
                   <SidebarMenuButton tooltip="Configurações">
                     <Settings />
                     <span>Configurações</span>
