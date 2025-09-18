@@ -119,26 +119,33 @@ export function AddClientForm({
       const cep = cepValue?.replace(/\D/g, '');
       if (cep && cep.length === 8) {
         setIsFetchingCep(true);
-        const result = await getAddressFromCEP(cep);
-        setIsFetchingCep(false);
-        if ('logradouro' in result) {
-          form.setValue('address.logradouro', result.logradouro || '');
-          form.setValue('address.bairro', result.bairro || '');
-          form.setValue('address.estado', result.estado || '');
-          // Trigger city update
-          const stateData = states.find(s => s.sigla === result.estado);
-          if (stateData && stateData.cidades.includes(result.cidade || '')) {
-            form.setValue('address.cidade', result.cidade || '');
-          } else {
-             form.setValue('address.cidade', '');
-          }
-          form.setFocus('address.numero');
-        } else {
-            toast({
+        try {
+            const result = await getAddressFromCEP(cep);
+            if ('logradouro' in result) {
+              form.setValue('address.logradouro', result.logradouro || '');
+              form.setValue('address.bairro', result.bairro || '');
+              form.setValue('address.estado', result.estado || '', { shouldValidate: true });
+              // We need to set the city value after the state has been updated and the cities list is populated.
+              // A timeout helps ensure the re-render has occurred.
+              setTimeout(() => {
+                  form.setValue('address.cidade', result.cidade || '', { shouldValidate: true });
+              }, 0);
+              form.setFocus('address.numero');
+            } else {
+                toast({
+                    variant: 'destructive',
+                    title: 'CEP não encontrado',
+                    description: result.error,
+                })
+            }
+        } catch (error) {
+             toast({
                 variant: 'destructive',
-                title: 'CEP não encontrado',
-                description: result.error,
+                title: 'Erro de Rede',
+                description: 'Não foi possível buscar o endereço.',
             })
+        } finally {
+            setIsFetchingCep(false);
         }
       }
     };
