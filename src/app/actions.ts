@@ -23,25 +23,48 @@ export async function getClients(): Promise<Client[]> {
   return mockClients;
 }
 
-export async function addClient(client: Omit<Client, 'id' | 'avatarUrl'>): Promise<Client> {
+export async function addClient(client: Omit<Client, 'id' | 'avatarUrl' | 'documents'> & { documents?: File[] }): Promise<Client> {
   await delay(500);
   const newId = (mockClients.length + 1).toString();
+  
+  // Simulate file upload
+  const uploadedDocuments = client.documents?.map(file => ({
+    name: file.name,
+    url: `/documents/${newId}/${file.name}`, // Simulated URL
+  })) || [];
+
   const newClient: Client = {
-    ...client,
+    name: client.name,
+    email: client.email,
+    phone: client.phone,
+    rate: client.rate,
     id: newId,
     avatarUrl: `https://picsum.photos/seed/${newId}/40/40`,
+    documents: uploadedDocuments,
   };
   mockClients.push(newClient);
   return newClient;
 }
 
-export async function updateClient(id: string, data: Omit<Client, 'id' | 'avatarUrl'>): Promise<Client> {
+export async function updateClient(id: string, data: Omit<Client, 'id' | 'avatarUrl' | 'documents'> & { documents?: File[] }): Promise<Client> {
   await delay(500);
   const clientIndex = mockClients.findIndex(c => c.id === id);
   if (clientIndex === -1) {
     throw new Error('Client not found');
   }
-  const updatedClient = { ...mockClients[clientIndex], ...data };
+
+  // Simulate file upload - in a real app, you'd handle new files, keep existing, or delete
+  const uploadedDocuments = data.documents?.map(file => ({
+    name: file.name,
+    url: `/documents/${id}/${file.name}`, // Simulated URL
+  })) || mockClients[clientIndex].documents;
+
+  const updatedClient = { 
+    ...mockClients[clientIndex], 
+    ...data,
+    documents: uploadedDocuments, 
+  };
+
   mockClients[clientIndex] = updatedClient;
   return updatedClient;
 }

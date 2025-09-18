@@ -195,6 +195,7 @@ export default function ClientsPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Cliente</TableHead>
+                  <TableHead>Contato</TableHead>
                   <TableHead>Total Faturado</TableHead>
                   <TableHead>Total Pago</TableHead>
                   <TableHead>Pendente</TableHead>
@@ -220,10 +221,14 @@ export default function ClientsPage() {
                         <div>
                           <div>{client.name}</div>
                           <div className="text-sm text-muted-foreground">
-                            {client.email}
+                            Taxa: ${client.rate}/h
                           </div>
                         </div>
                       </div>
+                    </TableCell>
+                     <TableCell>
+                      <div className="text-sm">{client.email}</div>
+                      <div className="text-sm text-muted-foreground">{client.phone}</div>
                     </TableCell>
                     <TableCell>
                       ${client.totalInvoiced.toLocaleString()}

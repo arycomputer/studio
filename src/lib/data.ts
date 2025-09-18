@@ -1,11 +1,11 @@
 import { Client, Invoice } from './types';
 
 export const clients: Client[] = [
-  { id: '1', name: 'Innovate Inc.', email: 'contact@innovate.com', avatarUrl: 'https://picsum.photos/seed/1/40/40' },
-  { id: '2', name: 'Solutions Co.', email: 'hello@solutions.co', avatarUrl: 'https://picsum.photos/seed/2/40/40' },
-  { id: '3', name: 'Apex Enterprises', email: 'support@apex.com', avatarUrl: 'https://picsum.photos/seed/3/40/40' },
-  { id: '4', name: 'Quantum Dynamics', email: 'info@quantum.dev', avatarUrl: 'https://picsum.photos/seed/4/40/40' },
-  { id: '5', name: 'Stellar Group', email: 'admin@stellar.org', avatarUrl: 'https://picsum.photos/seed/5/40/40' },
+  { id: '1', name: 'Innovate Inc.', email: 'contact@innovate.com', avatarUrl: 'https://picsum.photos/seed/1/40/40', phone: '123-456-7890', rate: 100 },
+  { id: '2', name: 'Solutions Co.', email: 'hello@solutions.co', avatarUrl: 'https://picsum.photos/seed/2/40/40', phone: '234-567-8901', rate: 120 },
+  { id: '3', name: 'Apex Enterprises', email: 'support@apex.com', avatarUrl: 'https://picsum.photos/seed/3/40/40', phone: '345-678-9012', rate: 90 },
+  { id: '4', name: 'Quantum Dynamics', email: 'info@quantum.dev', avatarUrl: 'https://picsum.photos/seed/4/40/40', phone: '456-789-0123', rate: 150 },
+  { id: '5', name: 'Stellar Group', email: 'admin@stellar.org', avatarUrl: 'https://picsum.photos/seed/5/40/40', phone: '567-890-1234', rate: 110 },
 ];
 
 export const invoices: Invoice[] = [
