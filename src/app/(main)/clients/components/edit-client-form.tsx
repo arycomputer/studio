@@ -25,7 +25,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { updateClient, deleteClientDocument, getAddressFromCEP } from '@/app/actions';
 import { useState, useEffect } from 'react';
-import { Loader2, Trash2, Download, X, File as FileIcon } from 'lucide-react';
+import { Loader2, Trash2, Download, X, File as FileIcon, UserX } from 'lucide-react';
 import type { Client } from '@/lib/types';
 import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
@@ -77,7 +77,7 @@ type EditClientFormProps = {
 };
 
 const isImageFile = (file: File) => file.type.startsWith('image/');
-const isImageUrl = (url: string) => /\.(jpeg|jpg|gif|png|webp)$/i.test(url);
+const isImageUrl = (url: string) => /\.(jpeg|jpg|gif|png|webp|data)$/i.test(url);
 
 
 export function EditClientForm({
@@ -92,6 +92,7 @@ export function EditClientForm({
   const [currentClient, setCurrentClient] = useState<Client>(client);
   const [newFiles, setNewFiles] = useState<File[]>([]);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [isPhotoRemoved, setIsPhotoRemoved] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -104,6 +105,7 @@ export function EditClientForm({
   useEffect(() => {
     setCurrentClient(client);
     setPhotoPreview(client.avatarUrl);
+    setIsPhotoRemoved(false);
     form.reset({
       name: client.name,
       email: client.email,
@@ -128,6 +130,7 @@ export function EditClientForm({
       const reader = new FileReader();
       reader.onloadend = () => {
         setPhotoPreview(reader.result as string);
+        setIsPhotoRemoved(false); // If a new photo is selected, it's not "removed"
       };
       reader.readAsDataURL(file);
     }
@@ -176,6 +179,13 @@ export function EditClientForm({
       event.target.value = '';
     }
   };
+  
+  const handleRemovePhoto = () => {
+    setPhotoPreview(null);
+    form.setValue('photo', null);
+    setIsPhotoRemoved(true);
+  };
+
 
   const removeNewFile = (indexToRemove: number) => {
     setNewFiles(newFiles.filter((_, index) => index !== indexToRemove));
@@ -247,7 +257,12 @@ export function EditClientForm({
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     try {
-      const updatedData = { ...values, newDocuments: newFiles, photo: values.photo?.[0] };
+      const updatedData = { 
+        ...values, 
+        newDocuments: newFiles, 
+        photo: values.photo?.[0],
+        removePhoto: isPhotoRemoved,
+      };
       const updated = await updateClient(client.id, updatedData);
       onClientUpdated(updated);
       toast({
@@ -290,13 +305,20 @@ export function EditClientForm({
                             <AvatarImage src={photoPreview || undefined} alt="Foto do cliente" />
                             <AvatarFallback>{client.name?.charAt(0)}</AvatarFallback>
                             </Avatar>
-                            <FormControl>
-                            <Input 
-                                type="file" 
-                                accept="image/*"
-                                onChange={(e) => field.onChange(e.target.files)}
-                            />
-                            </FormControl>
+                            <div className="flex flex-col gap-2">
+                                <FormControl>
+                                <Input 
+                                    type="file" 
+                                    accept="image/*"
+                                    className='max-w-48'
+                                    onChange={(e) => field.onChange(e.target.files)}
+                                />
+                                </FormControl>
+                                <Button type="button" variant="ghost" size="sm" className="text-destructive hover:text-destructive max-w-48" onClick={handleRemovePhoto}>
+                                    <UserX className="mr-2 h-4 w-4" />
+                                    Remover Foto
+                                </Button>
+                            </div>
                         </div>
                         <FormMessage />
                         </FormItem>

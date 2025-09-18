@@ -84,7 +84,7 @@ async function fileToDataUri(file: File): Promise<string> {
 }
 
 
-export async function updateClient(id: string, data: Omit<Client, 'id' | 'avatarUrl' | 'documents' | 'address'> & { address?: ClientAddress, newDocuments?: File[], photo?: File }): Promise<Client> {
+export async function updateClient(id: string, data: Omit<Client, 'id' | 'avatarUrl' | 'documents' | 'address'> & { address?: ClientAddress, newDocuments?: File[], photo?: File, removePhoto?: boolean }): Promise<Client> {
   await delay(500);
   const clientIndex = mockClients.findIndex(c => c.id === id);
   if (clientIndex === -1) {
@@ -100,7 +100,9 @@ export async function updateClient(id: string, data: Omit<Client, 'id' | 'avatar
   })) || [];
 
   let avatarUrl = existingClient.avatarUrl;
-  if (data.photo) {
+  if (data.removePhoto) {
+    avatarUrl = `https://picsum.photos/seed/${id}/40/40`; // Reset to default
+  } else if (data.photo) {
     // In a real app, you would upload the file to a storage service
     // and get a URL. Here, we'll convert to a data URI to simulate
     // an immediate update.
@@ -225,7 +227,5 @@ export async function deleteInvoice(id: string): Promise<{ success: boolean }> {
     mockInvoices.splice(invoiceIndex, 1);
     return { success: true };
 }
-
-    
 
     

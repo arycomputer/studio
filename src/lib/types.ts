@@ -41,5 +41,3 @@ export type Invoice = {
 };
 
     
-
-    
