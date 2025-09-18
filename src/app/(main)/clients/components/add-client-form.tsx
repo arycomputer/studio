@@ -36,7 +36,10 @@ const formSchema = z.object({
   email: z.string().email('Por favor, insira um e-mail válido.'),
   phone: z.string().optional(),
   address: z.string().optional(),
-  rate: z.coerce.number().optional(),
+  rate: z.coerce
+    .number({ invalid_type_error: 'A taxa deve ser um número.' })
+    .positive('A taxa de juros deve ser um número positivo.')
+    .optional(),
   documents: z.any().optional(),
 });
 
@@ -186,7 +189,7 @@ export function AddClientForm({
                 <FormItem>
                   <FormLabel>Taxa Mensal de Juros (%)</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="1.0" {...field} />
+                    <Input type="number" placeholder="1.0" step="0.1" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

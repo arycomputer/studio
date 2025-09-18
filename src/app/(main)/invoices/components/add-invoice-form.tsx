@@ -45,7 +45,7 @@ import { format } from 'date-fns';
 
 const formSchema = z.object({
   clientId: z.string().min(1, 'Por favor, selecione um cliente.'),
-  amount: z.coerce.number().min(0.01, 'O valor deve ser maior que zero.'),
+  amount: z.coerce.number({invalid_type_error: "O valor deve ser um número."}).min(0.01, 'O valor deve ser maior que zero.'),
   dueDate: z.date({
     required_error: 'A data de vencimento é obrigatória.',
   }),
@@ -144,7 +144,7 @@ export function AddInvoiceForm({
                   <FormItem>
                     <FormLabel>Valor</FormLabel>
                     <FormControl>
-                      <Input type="number" placeholder="0.00" {...field} />
+                      <Input type="number" placeholder="0.00" step="0.01" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
