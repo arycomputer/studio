@@ -60,6 +60,8 @@ export function AddClientForm({
     },
   });
 
+  const documents = form.watch('documents');
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     try {
@@ -161,6 +163,16 @@ export function AddClientForm({
                     />
                   </FormControl>
                   <FormMessage />
+                   {documents && documents.length > 0 && (
+                    <div className="text-sm text-muted-foreground mt-2">
+                        <p className="font-medium">Arquivos selecionados:</p>
+                        <ul>
+                        {Array.from(documents).map((file: any, index: number) => (
+                            <li key={index}>- {file.name}</li>
+                        ))}
+                        </ul>
+                    </div>
+                    )}
                 </FormItem>
               )}
             />

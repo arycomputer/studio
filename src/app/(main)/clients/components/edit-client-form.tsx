@@ -62,6 +62,8 @@ export function EditClientForm({
     },
   });
 
+  const documents = form.watch('documents');
+
   useEffect(() => {
     if (client) {
       form.reset({
@@ -173,12 +175,22 @@ export function EditClientForm({
                     />
                   </FormControl>
                   <FormMessage />
+                  {documents && documents.length > 0 && (
+                    <div className="text-sm text-muted-foreground mt-2">
+                        <p className="font-medium">Novos arquivos selecionados:</p>
+                        <ul>
+                        {Array.from(documents).map((file: any, index: number) => (
+                            <li key={index}>- {file.name}</li>
+                        ))}
+                        </ul>
+                    </div>
+                    )}
                   <div className='text-sm text-muted-foreground'>
                     {client.documents && client.documents.length > 0 && (
                       <div>
                         <p className='font-medium mt-2'>Documentos existentes:</p>
                         <ul>
-                          {client.documents.map(doc => <li key={doc.name}>{doc.name}</li>)}
+                          {client.documents.map(doc => <li key={doc.name}>- {doc.name}</li>)}
                         </ul>
                       </div>
                     )}
