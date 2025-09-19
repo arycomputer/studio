@@ -33,6 +33,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ClientCard } from './components/client-card';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const statusTranslations: { [key: string]: string } = {
     pending: 'Com Pendências',
@@ -119,6 +120,14 @@ function ClientsPageContent() {
     }
   };
   
+  const handleStatusFilterChange = (status: string) => {
+    if (status === 'all') {
+      router.push('/clients');
+    } else {
+      router.push(`/clients?status=${status}`);
+    }
+  };
+
   const clearFilter = () => {
     router.push('/clients');
   };
@@ -230,13 +239,27 @@ function ClientsPageContent() {
       </AlertDialog>
 
       <Card>
-        <CardHeader>
-          <CardTitle className="font-headline">
-            Visão Geral dos Clientes
-          </CardTitle>
-          <CardDescription>
-            Gerencie seus clientes e veja o histórico financeiro deles.
-          </CardDescription>
+        <CardHeader className="flex-col sm:flex-row sm:items-center sm:justify-between">
+          <div className='space-y-1.5'>
+            <CardTitle className="font-headline">
+              Visão Geral dos Clientes
+            </CardTitle>
+            <CardDescription>
+              Gerencie seus clientes e veja o histórico financeiro deles.
+            </CardDescription>
+          </div>
+           <div className="pt-2 sm:pt-0">
+             <Select value={filterStatus || 'all'} onValueChange={handleStatusFilterChange}>
+                <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectValue placeholder="Filtrar por situação" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos</SelectItem>
+                  <SelectItem value="pending">Com Pendências</SelectItem>
+                  <SelectItem value="paid">Em Dia</SelectItem>
+                </SelectContent>
+              </Select>
+           </div>
         </CardHeader>
         <CardContent>
           {loading ? (
