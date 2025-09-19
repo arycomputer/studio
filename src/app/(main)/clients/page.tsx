@@ -33,7 +33,8 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ClientCard } from './components/client-card';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 const statusTranslations: { [key: string]: string } = {
     pending: 'Com Pendências',
@@ -120,13 +121,14 @@ function ClientsPageContent() {
     }
   };
   
-  const handleStatusFilterChange = (status: string) => {
-    if (status === 'all') {
-      router.push('/clients');
+  const handleStatusFilterChange = (checked: boolean) => {
+    if (checked) {
+      router.push('/clients?status=pending');
     } else {
-      router.push(`/clients?status=${status}`);
+      router.push('/clients');
     }
   };
+
 
   const clearFilter = () => {
     router.push('/clients');
@@ -248,17 +250,13 @@ function ClientsPageContent() {
               Gerencie seus clientes e veja o histórico financeiro deles.
             </CardDescription>
           </div>
-           <div className="pt-2 sm:pt-0">
-             <Select value={filterStatus || 'all'} onValueChange={handleStatusFilterChange}>
-                <SelectTrigger className="w-full sm:w-[180px]">
-                  <SelectValue placeholder="Filtrar por situação" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos</SelectItem>
-                  <SelectItem value="pending">Com Pendências</SelectItem>
-                  <SelectItem value="paid">Em Dia</SelectItem>
-                </SelectContent>
-              </Select>
+           <div className="pt-2 sm:pt-0 flex items-center space-x-2">
+            <Switch 
+              id="status-filter"
+              checked={filterStatus === 'pending'}
+              onCheckedChange={handleStatusFilterChange}
+            />
+            <Label htmlFor="status-filter">Mostrar apenas com pendências</Label>
            </div>
         </CardHeader>
         <CardContent>
@@ -312,5 +310,7 @@ export default function ClientsPage() {
       </Suspense>
     );
   }
+
+    
 
     
