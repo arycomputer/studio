@@ -618,6 +618,7 @@ export function EditClientForm({
                               id="new-file-upload"
                               type="file" 
                               multiple
+                              accept="image/*,application/pdf"
                               onChange={handleFileChange}
                               className="sr-only"
                               disabled={isSubmitting}
@@ -650,3 +651,5 @@ export function EditClientForm({
     </Dialog>
   );
 }
+
+    
