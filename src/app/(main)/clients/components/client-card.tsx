@@ -12,12 +12,14 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import type { Client } from '@/lib/types';
+import { cn } from '@/lib/utils';
 import { MoreHorizontal } from 'lucide-react';
 
 type ClientData = Client & {
   totalInvoiced: number;
   totalPaid: number;
   balance: number;
+  isOverdue?: boolean;
 };
 
 type ClientCardProps = {
@@ -34,7 +36,7 @@ export function ClientCard({ client, onEdit, onDelete, onViewInvoices }: ClientC
     }).format(client.balance);
 
     return (
-        <Card className="w-full">
+        <Card className={cn("w-full", client.isOverdue && "border-destructive")}>
             <CardHeader className="flex flex-row items-center justify-between p-4">
                 <div className="flex items-center gap-3">
                     <Avatar className="h-10 w-10">

@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import type { Invoice } from '@/lib/types';
+import { cn } from '@/lib/utils';
 import { MoreHorizontal } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -41,7 +42,7 @@ export function InvoiceCard({ invoice, onViewDetails, onMarkAsPaid, onDelete }: 
     const formattedDueDate = format(dueDate, 'dd/MM/yyyy');
 
     return (
-        <Card className="w-full">
+        <Card className={cn("w-full", invoice.status === 'overdue' && "border-destructive")}>
              <CardHeader className="flex flex-row items-start justify-between p-4 pb-2">
                 <div>
                     <CardTitle className="text-base font-semibold">{invoice.clientName}</CardTitle>
@@ -94,4 +95,3 @@ export function InvoiceCard({ invoice, onViewDetails, onMarkAsPaid, onDelete }: 
         </Card>
     );
 }
-

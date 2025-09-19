@@ -133,7 +133,8 @@ function ClientsPageContent() {
       .filter((inv) => inv.status === 'paid')
       .reduce((sum, inv) => sum + inv.amount, 0);
     const balance = totalInvoiced - totalPaid;
-    return { ...client, totalInvoiced, totalPaid, balance };
+    const isOverdue = clientInvoices.some(inv => inv.status === 'overdue');
+    return { ...client, totalInvoiced, totalPaid, balance, isOverdue };
   }), [clients, invoices]);
 
   const filteredData = useMemo(() => {
