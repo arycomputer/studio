@@ -36,7 +36,10 @@ export function ClientCard({ client, onEdit, onDelete, onViewInvoices }: ClientC
     }).format(client.balance);
 
     return (
-        <Card className={cn("w-full", client.isOverdue && "border-destructive")}>
+        <Card 
+            className={cn("w-full cursor-pointer", client.isOverdue && "border-destructive")}
+            onDoubleClick={() => onEdit(client)}
+        >
             <CardHeader className="flex flex-row items-center justify-between p-4">
                 <div className="flex items-center gap-3">
                     <Avatar className="h-10 w-10">

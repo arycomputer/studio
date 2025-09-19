@@ -42,7 +42,10 @@ export function InvoiceCard({ invoice, onViewDetails, onMarkAsPaid, onDelete }: 
     const formattedDueDate = format(dueDate, 'dd/MM/yyyy');
 
     return (
-        <Card className={cn("w-full", invoice.status === 'overdue' && "border-destructive")}>
+        <Card 
+            className={cn("w-full cursor-pointer", invoice.status === 'overdue' && "border-destructive")}
+            onDoubleClick={() => onViewDetails(invoice)}
+        >
              <CardHeader className="flex flex-row items-start justify-between p-4 pb-2">
                 <div>
                     <CardTitle className="text-base font-semibold">{invoice.clientName}</CardTitle>
