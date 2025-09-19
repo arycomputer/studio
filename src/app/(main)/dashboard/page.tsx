@@ -201,7 +201,7 @@ export default async function DashboardPage() {
                             <Badge
                                 variant={
                                 invoice.status === 'paid'
-                                    ? 'default'
+                                    ? 'success'
                                     : invoice.status === 'overdue'
                                     ? 'destructive'
                                     : 'secondary'
@@ -226,5 +226,3 @@ export default async function DashboardPage() {
     </div>
   );
 }
-
-    

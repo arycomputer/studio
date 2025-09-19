@@ -63,7 +63,7 @@ export const getColumns = ({
         <Badge
           variant={
             status === 'paid'
-              ? 'default'
+              ? 'success'
               : status === 'overdue'
               ? 'destructive'
               : 'secondary'

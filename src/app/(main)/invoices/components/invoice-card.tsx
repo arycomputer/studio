@@ -78,7 +78,7 @@ export function InvoiceCard({ invoice, onViewDetails, onMarkAsPaid, onDelete }: 
                  <Badge
                     variant={
                         invoice.status === 'paid'
-                        ? 'default'
+                        ? 'success'
                         : invoice.status === 'overdue'
                         ? 'destructive'
                         : 'secondary'
