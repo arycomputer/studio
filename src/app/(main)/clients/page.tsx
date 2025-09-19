@@ -27,10 +27,6 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { DataTable } from '@/components/data-table/data-table';
-import { getColumns } from './components/columns';
-import type { ColumnDef } from '@tanstack/react-table';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { ClientCard } from './components/client-card';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
@@ -54,7 +50,6 @@ function ClientsPageContent() {
   const { toast } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const isMobile = useIsMobile();
   
   const filterStatus = searchParams.get('status');
 
@@ -172,13 +167,6 @@ function ClientsPageContent() {
     return '';
   }
 
-
-  const columns = getColumns({
-    onEdit: handleEditClick,
-    onDelete: handleDeleteClick,
-    onViewInvoices: handleViewInvoicesClick,
-  });
-
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center justify-between">
@@ -262,19 +250,17 @@ function ClientsPageContent() {
         <CardContent>
           {loading ? (
             <p>Carregando clientes...</p>
-          ) : isMobile === undefined ? (
-             <p>Carregando visualização...</p>
-          ) : isMobile ? (
-            <div className="space-y-4">
+          ) : (
+             <div className="space-y-4">
               <Input 
                 placeholder="Filtrar por nome..." 
                 value={filter} 
                 onChange={(e) => setFilter(e.target.value)}
-                className="h-9 w-full"
+                className="h-9 w-full max-w-sm"
               />
-              <div className="space-y-4">
               {filteredData.length > 0 ? (
-                filteredData.map(client => (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {filteredData.map(client => (
                     <ClientCard 
                         key={client.id}
                         client={client}
@@ -282,20 +268,12 @@ function ClientsPageContent() {
                         onDelete={handleDeleteClick}
                         onViewInvoices={handleViewInvoicesClick}
                     />
-                ))
+                ))}
+                </div>
               ) : (
                 <p className="text-center text-muted-foreground pt-4">Nenhum cliente encontrado.</p>
               )}
-              </div>
             </div>
-          ) : (
-            <DataTable
-              columns={columns as ColumnDef<unknown, unknown>[]}
-              data={filteredData}
-              filterColumnId="name"
-              filterPlaceholder="Filtrar por nome..."
-              onRowDoubleClick={handleEditClick}
-            />
           )}
         </CardContent>
       </Card>
@@ -310,7 +288,3 @@ export default function ClientsPage() {
       </Suspense>
     );
   }
-
-    
-
-    

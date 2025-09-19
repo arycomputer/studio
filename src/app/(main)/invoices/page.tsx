@@ -32,11 +32,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { DataTable } from '@/components/data-table/data-table';
-import { getColumns } from './components/columns';
-import type { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { InvoiceCard } from './components/invoice-card';
 import { Input } from '@/components/ui/input';
 
@@ -59,7 +55,6 @@ function InvoicesPageContent() {
   const { toast } = useToast();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const isMobile = useIsMobile();
 
   const clientId = searchParams.get('clientId');
   const filterStatus = searchParams.get('status');
@@ -189,12 +184,6 @@ function InvoicesPageContent() {
     router.push('/invoices');
   };
 
-  const columns = getColumns({
-    onViewDetails: handleViewDetails,
-    onMarkAsPaid: handleMarkAsPaid,
-    onDelete: handleDeleteClick,
-  });
-
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center justify-between">
@@ -267,19 +256,17 @@ function InvoicesPageContent() {
         <CardContent>
           {loading ? (
             <p>Carregando faturas...</p>
-          ) : isMobile === undefined ? (
-             <p>Carregando visualização...</p>
-          ) : isMobile ? (
+          ) : (
              <div className="space-y-4">
               <Input 
                 placeholder="Filtrar por cliente..." 
                 value={filter} 
                 onChange={(e) => setFilter(e.target.value)}
-                className="h-9 w-full"
+                className="h-9 w-full max-w-sm"
               />
-              <div className="space-y-4">
               {filteredInvoices.length > 0 ? (
-                filteredInvoices.map(invoice => (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {filteredInvoices.map(invoice => (
                     <InvoiceCard 
                         key={invoice.id}
                         invoice={invoice}
@@ -287,19 +274,12 @@ function InvoicesPageContent() {
                         onMarkAsPaid={handleMarkAsPaid}
                         onDelete={handleDeleteClick}
                     />
-                ))
+                ))}
+                </div>
               ) : (
                  <p className="text-center text-muted-foreground pt-4">Nenhuma fatura encontrada.</p>
               )}
-              </div>
             </div>
-          ) : (
-            <DataTable
-              columns={columns as ColumnDef<unknown, unknown>[]}
-              data={filteredInvoices}
-              filterColumnId="clientName"
-              filterPlaceholder="Filtrar por cliente..."
-            />
           )}
         </CardContent>
       </Card>
