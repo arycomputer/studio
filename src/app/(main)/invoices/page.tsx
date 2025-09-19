@@ -7,7 +7,7 @@ import {
   getClients,
   deleteInvoice,
   updateInvoiceStatus,
-} from '@/app/actions';
+} from '@/actions';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -59,7 +59,6 @@ function InvoicesPageContent() {
   const { toast } = useToast();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const {pathname} = useRouter();
   const isMobile = useIsMobile();
 
   const clientId = searchParams.get('clientId');
@@ -276,7 +275,7 @@ function InvoicesPageContent() {
                 placeholder="Filtrar por cliente..." 
                 value={filter} 
                 onChange={(e) => setFilter(e.target.value)}
-                className="h-8 w-full"
+                className="h-9 w-full"
               />
               <div className="space-y-4">
               {filteredInvoices.length > 0 ? (

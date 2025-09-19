@@ -248,7 +248,7 @@ function ClientsPageContent() {
                 placeholder="Filtrar por nome..." 
                 value={filter} 
                 onChange={(e) => setFilter(e.target.value)}
-                className="h-8 w-full"
+                className="h-9 w-full"
               />
               <div className="space-y-4">
               {filteredData.length > 0 ? (
