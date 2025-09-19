@@ -16,7 +16,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { PlusCircle, X } from 'lucide-react';
+import { PlusCircle, X, ListFilter } from 'lucide-react';
 import type { Invoice, Client, InvoiceStatus } from '@/lib/types';
 import { AddInvoiceForm } from './components/add-invoice-form';
 import { InvoiceDetailsSheet } from './components/invoice-details-sheet';
@@ -35,13 +35,30 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { format } from 'date-fns';
 import { InvoiceCard } from './components/invoice-card';
 import { Input } from '@/components/ui/input';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { CheckedState } from '@radix-ui/react-checkbox';
 
 const statusTranslations: { [key: string]: string } = {
     paid: 'Pagas',
     pending: 'Pendentes',
     overdue: 'Atrasadas',
+    'written-off': 'Baixadas',
     'pending,overdue': 'Pendentes e Atrasadas'
 };
+
+const statusOptions: {id: InvoiceStatus, label: string}[] = [
+    {id: 'pending', label: 'Pendente'},
+    {id: 'overdue', label: 'Atrasada'},
+    {id: 'paid', label: 'Paga'},
+    {id: 'written-off', label: 'Baixada'},
+]
 
 function InvoicesPageContent() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -101,17 +118,25 @@ function InvoicesPageContent() {
 
 
   const getFilterDescription = () => {
-    if(clientId) {
-        return <>para o cliente: <span className="font-semibold">{filteredClient?.name}</span></>;
+    let descriptions: React.ReactNode[] = [];
+    if(clientId && filteredClient) {
+        descriptions.push(<>para o cliente: <span className="font-semibold">{filteredClient?.name}</span></>);
     }
     if(filterStatus) {
-        const translated = statusTranslations[filterStatus] || filterStatus;
-        return <>com status: <span className="font-semibold">{translated}</span></>;
+        const translated = filterStatus.split(',').map(s => statusTranslations[s] || s).join(' e ');
+        descriptions.push(<>com status: <span className="font-semibold">{translated}</span></>);
     }
     if(filterDueDate === 'today') {
-        return <>com <span className="font-semibold">vencimento hoje</span></>;
+        descriptions.push(<>com <span className="font-semibold">vencimento hoje</span></>);
     }
-    return '';
+
+    return descriptions.reduce((prev, curr, i) => (
+      <>
+        {prev}
+        {i > 0 && ' e '}
+        {curr}
+      </>
+    ), <></>);
   }
 
 
@@ -184,6 +209,25 @@ function InvoicesPageContent() {
     router.push('/invoices');
   };
 
+  const handleStatusFilterChange = (status: InvoiceStatus) => (checked: CheckedState) => {
+    const currentStatuses = filterStatus ? filterStatus.split(',') : [];
+    let newStatuses: string[];
+
+    if (checked) {
+      newStatuses = [...currentStatuses, status];
+    } else {
+      newStatuses = currentStatuses.filter(s => s !== status);
+    }
+
+    const params = new URLSearchParams(searchParams.toString());
+    if (newStatuses.length > 0) {
+      params.set('status', newStatuses.join(','));
+    } else {
+      params.delete('status');
+    }
+    router.push(`/invoices?${params.toString()}`);
+  };
+
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center justify-between">
@@ -247,23 +291,48 @@ function InvoicesPageContent() {
       </AlertDialog>
 
       <Card>
-        <CardHeader>
-          <CardTitle className="font-headline">Histórico de Faturas</CardTitle>
-          <CardDescription>
-            Veja e gerencie todas as suas faturas.
-          </CardDescription>
+        <CardHeader className="flex-col sm:flex-row sm:items-center sm:justify-between">
+            <div className='space-y-1.5'>
+                <CardTitle className="font-headline">Histórico de Faturas</CardTitle>
+                <CardDescription>
+                    Veja e gerencie todas as suas faturas.
+                </CardDescription>
+            </div>
+            <div className="flex items-center gap-2 pt-2 sm:pt-0">
+                <Input 
+                    placeholder="Filtrar por cliente..." 
+                    value={filter} 
+                    onChange={(e) => setFilter(e.target.value)}
+                    className="h-9 w-full max-w-sm"
+                />
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="h-9">
+                        <ListFilter className="mr-2 h-4 w-4" />
+                        Situação
+                    </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>Filtrar por Situação</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {statusOptions.map(option => (
+                        <DropdownMenuCheckboxItem
+                            key={option.id}
+                            checked={filterStatus?.includes(option.id)}
+                            onCheckedChange={handleStatusFilterChange(option.id)}
+                        >
+                            {option.label}
+                        </DropdownMenuCheckboxItem>
+                    ))}
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </div>
         </CardHeader>
         <CardContent>
           {loading ? (
             <p>Carregando faturas...</p>
           ) : (
              <div className="space-y-4">
-              <Input 
-                placeholder="Filtrar por cliente..." 
-                value={filter} 
-                onChange={(e) => setFilter(e.target.value)}
-                className="h-9 w-full max-w-sm"
-              />
               {filteredInvoices.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {filteredInvoices.map(invoice => (

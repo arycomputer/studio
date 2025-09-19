@@ -117,16 +117,20 @@ function ClientsPageContent() {
   };
   
   const handleStatusFilterChange = (checked: boolean) => {
+    const params = new URLSearchParams(searchParams.toString());
     if (checked) {
-      router.push('/clients?status=pending');
+      params.set('status', 'pending');
     } else {
-      router.push('/clients');
+      params.delete('status');
     }
+    router.push(`/clients?${params.toString()}`);
   };
 
 
   const clearFilter = () => {
-    router.push('/clients');
+     const params = new URLSearchParams(searchParams.toString());
+     params.delete('status');
+     router.push(`/clients?${params.toString()}`);
   };
 
   const clientData = useMemo(() => clients.map((client) => {
