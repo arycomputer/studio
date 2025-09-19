@@ -1,8 +1,8 @@
 
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { deleteClient, getClients, getInvoices } from '@/app/actions';
+import { Suspense, useEffect, useMemo, useState } from 'react';
+import { deleteClient, getClients, getInvoices } from '@/actions';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, X } from 'lucide-react';
 import type { Client, Invoice } from '@/lib/types';
 import { AddClientForm } from './components/add-client-form';
 import { EditClientForm } from './components/edit-client-form';
@@ -26,7 +26,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { DataTable } from '@/components/data-table/data-table';
 import { getColumns } from './components/columns';
 import type { ColumnDef } from '@tanstack/react-table';
@@ -34,7 +34,13 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { ClientCard } from './components/client-card';
 import { Input } from '@/components/ui/input';
 
-export default function ClientsPage() {
+const statusTranslations: { [key: string]: string } = {
+    pending: 'Com Pendências',
+    paid: 'Em Dia',
+};
+
+
+function ClientsPageContent() {
   const [clients, setClients] = useState<Client[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,7 +51,10 @@ export default function ClientsPage() {
   const [filter, setFilter] = useState('');
   const { toast } = useToast();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const isMobile = useIsMobile();
+  
+  const filterStatus = searchParams.get('status');
 
   useEffect(() => {
     async function fetchData() {
@@ -109,6 +118,10 @@ export default function ClientsPage() {
       setSelectedClient(null);
     }
   };
+  
+  const clearFilter = () => {
+    router.push('/clients');
+  };
 
   const clientData = useMemo(() => clients.map((client) => {
     const clientInvoices = invoices.filter((inv) => inv.clientId === client.id);
@@ -124,9 +137,29 @@ export default function ClientsPage() {
   }), [clients, invoices]);
 
   const filteredData = useMemo(() => {
-    if (!filter) return clientData;
-    return clientData.filter(client => client.name.toLowerCase().includes(filter.toLowerCase()));
-  }, [clientData, filter]);
+    let baseData = [...clientData];
+    
+    if (filterStatus) {
+        if(filterStatus === 'pending') {
+            baseData = baseData.filter(client => client.balance > 0);
+        } else if (filterStatus === 'paid') {
+            baseData = baseData.filter(client => client.balance <= 0);
+        }
+    }
+    
+    if (!filter) return baseData;
+    
+    return baseData.filter(client => client.name.toLowerCase().includes(filter.toLowerCase()));
+  }, [clientData, filter, filterStatus]);
+  
+  const getFilterDescription = () => {
+    if(filterStatus) {
+        const translated = statusTranslations[filterStatus] || filterStatus;
+        return <>com status: <span className="font-semibold">{translated}</span></>;
+    }
+    return '';
+  }
+
 
   const columns = getColumns({
     onEdit: handleEditClick,
@@ -143,6 +176,24 @@ export default function ClientsPage() {
           Adicionar Cliente
         </Button>
       </div>
+      
+      {(filterStatus) && (
+        <div className="flex items-center gap-2 rounded-lg border bg-secondary/50 p-3">
+          <span className="text-sm">
+            Mostrando clientes {getFilterDescription()}
+          </span>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6"
+            onClick={clearFilter}
+          >
+            <X className="h-4 w-4" />
+            <span className="sr-only">Limpar filtro</span>
+          </Button>
+        </div>
+      )}
+
 
       <AddClientForm
         isOpen={isAddClientOpen}
@@ -218,7 +269,7 @@ export default function ClientsPage() {
           ) : (
             <DataTable
               columns={columns as ColumnDef<unknown, unknown>[]}
-              data={clientData}
+              data={filteredData}
               filterColumnId="name"
               filterPlaceholder="Filtrar por nome..."
               onRowDoubleClick={handleEditClick}
@@ -229,3 +280,13 @@ export default function ClientsPage() {
     </div>
   );
 }
+
+export default function ClientsPage() {
+    return (
+      <Suspense fallback={<div>Carregando...</div>}>
+        <ClientsPageContent />
+      </Suspense>
+    );
+  }
+
+    

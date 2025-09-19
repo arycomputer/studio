@@ -90,16 +90,16 @@ export default async function DashboardPage() {
             </CardContent>
             </Card>
         </Link>
-        <Link href="/clients">
+        <Link href="/clients?status=pending">
             <Card className="hover:bg-muted/50 transition-colors">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Clientes</CardTitle>
+                <CardTitle className="text-sm font-medium">Clientes com Pendências</CardTitle>
                 <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
                 <div className="text-2xl font-bold">+{clients.length}</div>
                 <p className="text-xs text-muted-foreground">
-                Número total de clientes gerenciados.
+                Clientes com pagamentos pendentes.
                 </p>
             </CardContent>
             </Card>
@@ -226,3 +226,5 @@ export default async function DashboardPage() {
     </div>
   );
 }
+
+    
