@@ -295,10 +295,10 @@ export function EditClientForm({
             Atualize os detalhes do cliente abaixo.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex-1 overflow-hidden">
-          <ScrollArea className="h-full px-6">
+        <div className="flex-1 overflow-hidden px-6">
+          <ScrollArea className="h-full pr-4">
             <Form {...form}>
-              <form id="edit-client-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4 pr-2">
+              <form id="edit-client-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
                  <FormField
                     control={form.control}
                     name="photo"
@@ -631,7 +631,7 @@ export function EditClientForm({
             </Form>
           </ScrollArea>
         </div>
-        <DialogFooter className="px-6 pb-6 pt-4 border-t bg-background sticky bottom-0">
+        <DialogFooter className="px-6 pb-6 pt-4 border-t">
           <Button
             type="button"
             variant="outline"
@@ -651,3 +651,5 @@ export function EditClientForm({
     </Dialog>
   );
 }
+
+    

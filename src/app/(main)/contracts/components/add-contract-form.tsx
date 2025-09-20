@@ -39,7 +39,7 @@ import { useToast } from '@/hooks/use-toast';
 import { addContract } from '@/actions';
 import { useState } from 'react';
 import { CalendarIcon, Loader2 } from 'lucide-react';
-import type { Client, Contract, ContractType } from '@/lib/types';
+import type { Client, Contract } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -132,10 +132,10 @@ export function AddContractForm({
             Preencha os detalhes abaixo para criar um novo contrato.
           </DialogDescription>
         </DialogHeader>
-        <div className='flex-1 overflow-hidden'>
-          <ScrollArea className="h-full px-6">
+        <div className='flex-1 overflow-hidden px-6'>
+          <ScrollArea className="h-full pr-4">
             <Form {...form}>
-              <form id="add-contract-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 py-4 pr-2">
+              <form id="add-contract-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 py-4">
                 <FormField
                   control={form.control}
                   name="clientId"
@@ -279,7 +279,7 @@ export function AddContractForm({
             </Form>
           </ScrollArea>
         </div>
-        <DialogFooter className="px-6 pb-6 pt-4 border-t bg-background sticky bottom-0">
+        <DialogFooter className="px-6 pb-6 pt-4 border-t">
           <Button
             type="button"
             variant="outline"
@@ -299,3 +299,5 @@ export function AddContractForm({
     </Dialog>
   );
 }
+
+    

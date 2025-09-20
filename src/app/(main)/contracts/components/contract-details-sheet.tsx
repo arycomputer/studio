@@ -1,9 +1,6 @@
 
 'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -15,7 +12,7 @@ import {
 } from '@/components/ui/sheet';
 import { useToast } from '@/hooks/use-toast';
 import { generateInvoicesForContract } from '@/actions';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Loader2, FilePlus2 } from 'lucide-react';
 import type { Contract, Client } from '@/lib/types';
 import { format } from 'date-fns';
@@ -88,9 +85,9 @@ export function ContractDetailsSheet({
             Veja os detalhes do contrato #{contract.id}.
           </SheetDescription>
         </SheetHeader>
-        <div className="flex-1 overflow-hidden">
-          <ScrollArea className="h-full px-6">
-            <div className="space-y-6 py-4 pr-2">
+        <div className="flex-1 overflow-hidden px-6">
+          <ScrollArea className="h-full pr-4">
+            <div className="space-y-6 py-4">
               <div className="flex justify-between items-center">
                   <span className="font-medium text-muted-foreground">Cliente</span>
                   <span>{contract.clientName}</span>
@@ -124,7 +121,7 @@ export function ContractDetailsSheet({
             </div>
           </ScrollArea>
         </div>
-        <SheetFooter className="px-6 pb-6 pt-4 border-t bg-background sticky bottom-0 flex-col sm:flex-col sm:items-stretch gap-2">
+        <SheetFooter className="px-6 pb-6 pt-4 border-t flex-col sm:flex-col sm:items-stretch gap-2">
             <Button 
                 type="button" 
                 onClick={handleGenerateInvoices} 
@@ -146,3 +143,5 @@ export function ContractDetailsSheet({
     </Sheet>
   );
 }
+
+    
