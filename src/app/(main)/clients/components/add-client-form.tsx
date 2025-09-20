@@ -495,5 +495,3 @@ export function AddClientForm({
     </Dialog>
   );
 }
-
-    

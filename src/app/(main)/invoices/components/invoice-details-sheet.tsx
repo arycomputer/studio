@@ -253,5 +253,3 @@ export function InvoiceDetailsSheet({
     </Sheet>
   );
 }
-
-    
