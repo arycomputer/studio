@@ -32,7 +32,7 @@ export default function MainLayout({
 }) {
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen">
+      <div className="flex h-screen min-h-screen">
         <Sidebar collapsible="icon" className="border-r">
           <SidebarHeader>
             <div className="flex items-center gap-2 p-2">
