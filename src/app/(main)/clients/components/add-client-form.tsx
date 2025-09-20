@@ -228,14 +228,14 @@ export function AddClientForm({
         onOpenChange(open);
     }}>
       <DialogContent className="sm:max-w-lg max-h-[90svh] flex flex-col">
-        <DialogHeader>
+        <DialogHeader className="px-6 pt-6">
           <DialogTitle>Adicionar Novo Cliente</DialogTitle>
           <DialogDescription>
             Preencha os detalhes abaixo para adicionar um novo cliente.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex-1 overflow-hidden -mx-6 px-6">
-          <ScrollArea className="h-full pr-4">
+        <div className="flex-1 overflow-hidden">
+          <ScrollArea className="h-full px-6">
             <Form {...form}>
               <form id="add-client-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4 pr-2">
                 <FormField
@@ -475,7 +475,7 @@ export function AddClientForm({
             </Form>
           </ScrollArea>
         </div>
-        <DialogFooter className="pt-4 border-t -mx-6 px-6 bg-background sticky bottom-0">
+        <DialogFooter className="px-6 pb-6 pt-4 border-t bg-background sticky bottom-0">
           <Button
             type="button"
             variant="outline"
@@ -495,3 +495,5 @@ export function AddClientForm({
     </Dialog>
   );
 }
+
+    
