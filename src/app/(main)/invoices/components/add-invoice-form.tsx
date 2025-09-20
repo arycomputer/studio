@@ -200,7 +200,7 @@ export function AddInvoiceForm({
             </Form>
           </ScrollArea>
         </div>
-        <DialogFooter className="border-t pt-4 -mx-6 px-6">
+        <DialogFooter className="border-t pt-4 -mx-6 px-6 bg-background sticky bottom-0">
           <Button
             type="button"
             variant="outline"

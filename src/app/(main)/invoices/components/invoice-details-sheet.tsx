@@ -149,8 +149,7 @@ export function InvoiceDetailsSheet({
         </SheetHeader>
         <div className="flex-1 overflow-hidden -mx-6 px-6">
           <ScrollArea className="h-full pr-4">
-            <div className="py-4 pr-2">
-              <div className="space-y-6">
+            <div className="space-y-6 py-4 pr-2">
               <div className="flex justify-between items-center">
                   <span className="font-medium text-muted-foreground">Status</span>
                   <Badge
@@ -200,9 +199,8 @@ export function InvoiceDetailsSheet({
                       <span>{getFormattedDate(invoice.paymentDate)}</span>
                   </div>
               )}
-              </div>
               <Form {...form}>
-              <form id="status-update-form" onSubmit={form.handleSubmit(onSubmit)} className="mt-8">
+              <form id="status-update-form" onSubmit={form.handleSubmit(onSubmit)} className="pt-8">
                   <FormField
                   control={form.control}
                   name="status"
@@ -235,7 +233,7 @@ export function InvoiceDetailsSheet({
             </div>
           </ScrollArea>
         </div>
-        <SheetFooter className="border-t pt-4 -mx-6 px-6">
+        <SheetFooter className="border-t pt-4 -mx-6 px-6 bg-background sticky bottom-0">
             <Button
                 type="button"
                 variant="outline"
