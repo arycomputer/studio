@@ -29,10 +29,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { updateInvoiceStatus } from '@/actions';
+import { updateContractStatus } from '@/actions';
 import { useState, useEffect, useMemo } from 'react';
 import { Loader2 } from 'lucide-react';
-import type { Invoice, InvoiceStatus, Client } from '@/lib/types';
+import type { Contract, ContractStatus, Client } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
 import { format, differenceInDays } from 'date-fns';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -42,90 +42,91 @@ const formSchema = z.object({
 });
 
 const statusTranslations: { [key: string]: string } = {
-  paid: 'Paga',
+  paid: 'Pago',
   pending: 'Pendente',
-  overdue: 'Atrasada',
-  'written-off': 'Baixada',
+  overdue: 'Atrasado',
+  'written-off': 'Baixado',
 };
 
-type InvoiceDetailsSheetProps = {
+const typeTranslations: { [key: string]: string } = {
+  single: 'Parcela Única',
+  installment: 'Parcelado',
+};
+
+type ContractDetailsSheetProps = {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
-  invoice: Invoice;
-  onInvoiceUpdated: (invoice: Invoice) => void;
+  contract: Contract;
+  onContractUpdated: (contract: Contract) => void;
   clients: Client[];
 };
 
-export function InvoiceDetailsSheet({
+export function ContractDetailsSheet({
   isOpen,
   onOpenChange,
-  invoice,
-  onInvoiceUpdated,
+  contract,
+  onContractUpdated,
   clients,
-}: InvoiceDetailsSheetProps) {
+}: ContractDetailsSheetProps) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      status: invoice.status,
+      status: contract.status,
     },
   });
   
-  const client = useMemo(() => clients.find(c => c.id === invoice.clientId), [clients, invoice.clientId]);
-
   const interestCalculation = useMemo(() => {
-    if (invoice.status !== 'overdue' || !client?.rate) {
+    if (contract.status !== 'overdue' || !contract.interestRate) {
       return null;
     }
 
-    const dueDate = new Date(invoice.dueDate);
+    const dueDate = new Date(contract.dueDate);
     dueDate.setMinutes(dueDate.getMinutes() + dueDate.getTimezoneOffset());
     const daysOverdue = differenceInDays(new Date(), dueDate);
 
     if (daysOverdue <= 0) return null;
     
-    // Simple interest calculation: P * r * t
-    // P = Principal amount, r = daily interest rate, t = time in days
-    const dailyRate = (client.rate / 100) / 30; // Assuming monthly rate
-    const interest = invoice.amount * dailyRate * daysOverdue;
-    const totalAmount = invoice.amount + interest;
+    const dailyRate = (contract.interestRate / 100) / 30; // Assuming monthly rate
+    const interest = contract.amount * dailyRate * daysOverdue;
+    const totalAmount = contract.amount + interest;
 
     return {
         interest,
         totalAmount,
         daysOverdue
     };
-  }, [invoice, client]);
+  }, [contract]);
 
 
   useEffect(() => {
-    if (invoice) {
+    if (contract) {
       form.reset({
-        status: invoice.status,
+        status: contract.status,
       });
     }
-  }, [invoice, form]);
+  }, [contract, form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     try {
-      const updatedInvoice = await updateInvoiceStatus(
-        invoice.id,
-        values.status as InvoiceStatus
+      const updatedContract = await updateContractStatus(
+        contract.id,
+        values.status as ContractStatus
       );
-      onInvoiceUpdated(updatedInvoice);
+      onContractUpdated(updatedContract);
       toast({
         title: 'Sucesso!',
-        description: 'Status da fatura atualizado.',
+        description: 'Status do contrato atualizado.',
       });
       onOpenChange(false);
     } catch (error) {
       toast({
         variant: 'destructive',
         title: 'Erro',
-        description: 'Não foi possível atualizar a fatura. Tente novamente.',
+        description: 'Não foi possível atualizar o contrato. Tente novamente.',
       });
     } finally {
       setIsSubmitting(false);
@@ -142,9 +143,9 @@ export function InvoiceDetailsSheet({
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
       <SheetContent className="sm:max-w-lg flex flex-col max-h-[100svh]">
         <SheetHeader className="px-6 pt-6">
-          <SheetTitle>Detalhes da Fatura</SheetTitle>
+          <SheetTitle>Detalhes do Contrato</SheetTitle>
           <SheetDescription>
-            Veja e edite os detalhes da fatura #{invoice.id}.
+            Veja e edite os detalhes do contrato #{contract.id}.
           </SheetDescription>
         </SheetHeader>
         <div className="flex-1 overflow-hidden">
@@ -154,24 +155,32 @@ export function InvoiceDetailsSheet({
                   <span className="font-medium text-muted-foreground">Status</span>
                   <Badge
                   variant={
-                      invoice.status === 'paid'
+                      contract.status === 'paid'
                       ? 'success'
-                      : invoice.status === 'overdue'
+                      : contract.status === 'overdue'
                       ? 'destructive'
                       : 'secondary'
                   }
                   className="capitalize"
                   >
-                  {statusTranslations[invoice.status]}
+                  {statusTranslations[contract.status]}
                   </Badge>
               </div>
               <div className="flex justify-between items-center">
                   <span className="font-medium text-muted-foreground">Cliente</span>
-                  <span>{invoice.clientName}</span>
+                  <span>{contract.clientName}</span>
+              </div>
+               <div className="flex justify-between items-center">
+                  <span className="font-medium text-muted-foreground">Tipo</span>
+                  <span>{typeTranslations[contract.type]}</span>
               </div>
               <div className="flex justify-between items-center">
                   <span className="font-medium text-muted-foreground">Valor Original</span>
-                  <span className="font-semibold">{invoice.amount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                  <span className="font-semibold">{contract.amount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+              </div>
+               <div className="flex justify-between items-center">
+                  <span className="font-medium text-muted-foreground">Taxa de Juros</span>
+                  <span>{contract.interestRate}% a.m.</span>
               </div>
               {interestCalculation && (
                   <>
@@ -187,16 +196,16 @@ export function InvoiceDetailsSheet({
               )}
               <div className="flex justify-between items-center">
                   <span className="font-medium text-muted-foreground">Data de Emissão</span>
-                  <span>{getFormattedDate(invoice.issueDate)}</span>
+                  <span>{getFormattedDate(contract.issueDate)}</span>
               </div>
               <div className="flex justify-between items-center">
                   <span className="font-medium text-muted-foreground">Data de Vencimento</span>
-                  <span>{getFormattedDate(invoice.dueDate)}</span>
+                  <span>{getFormattedDate(contract.dueDate)}</span>
               </div>
-              {invoice.paymentDate && (
+              {contract.paymentDate && (
                   <div className="flex justify-between items-center">
                       <span className="font-medium text-muted-foreground">Data de Pagamento</span>
-                      <span>{getFormattedDate(invoice.paymentDate)}</span>
+                      <span>{getFormattedDate(contract.paymentDate)}</span>
                   </div>
               )}
               <Form {...form}>
@@ -219,9 +228,9 @@ export function InvoiceDetailsSheet({
                           </FormControl>
                           <SelectContent>
                           <SelectItem value="pending">Pendente</SelectItem>
-                          <SelectItem value="paid">Paga</SelectItem>
-                          <SelectItem value="overdue">Atrasada</SelectItem>
-                          <SelectItem value="written-off">Baixada</SelectItem>
+                          <SelectItem value="paid">Pago</SelectItem>
+                          <SelectItem value="overdue">Atrasado</SelectItem>
+                          <SelectItem value="written-off">Baixado</SelectItem>
                           </SelectContent>
                       </Select>
                       <FormMessage />
@@ -253,5 +262,3 @@ export function InvoiceDetailsSheet({
     </Sheet>
   );
 }
-
-    

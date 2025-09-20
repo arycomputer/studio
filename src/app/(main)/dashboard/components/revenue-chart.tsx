@@ -9,7 +9,7 @@ import {
   YAxis,
   Tooltip,
 } from 'recharts';
-import { Invoice } from '@/lib/types';
+import { Contract } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   ChartContainer,
@@ -17,17 +17,17 @@ import {
 } from '@/components/ui/chart';
 
 interface RevenueChartProps {
-  invoices: Invoice[];
+  contracts: Contract[];
 }
 
-export function RevenueChart({ invoices }: RevenueChartProps) {
-  const monthlyRevenue = invoices
-    .filter((invoice) => invoice.status === 'paid' && invoice.paymentDate)
-    .reduce((acc, invoice) => {
-      const month = new Date(invoice.paymentDate!).toLocaleString('pt-BR', {
+export function RevenueChart({ contracts }: RevenueChartProps) {
+  const monthlyRevenue = contracts
+    .filter((contract) => contract.status === 'paid' && contract.paymentDate)
+    .reduce((acc, contract) => {
+      const month = new Date(contract.paymentDate!).toLocaleString('pt-BR', {
         month: 'short',
       });
-      acc[month] = (acc[month] || 0) + invoice.amount;
+      acc[month] = (acc[month] || 0) + contract.amount;
       return acc;
     }, {} as Record<string, number>);
 

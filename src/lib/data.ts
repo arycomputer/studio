@@ -1,5 +1,6 @@
 
-import { Client, Invoice } from './types';
+
+import { Client, Contract } from './types';
 
 export const clients: Client[] = [
   { id: '1', name: 'Innovate Inc.', email: 'contact@innovate.com', avatarUrl: 'https://placehold.co/40x40/E2E8F0/475569?text=II', phone: '123-456-7890', rate: 1.5, address: { logradouro: '123 Innovation Dr', cidade: 'Techville', estado: 'CA', cep: '12345' } },
@@ -9,9 +10,9 @@ export const clients: Client[] = [
   { id: '5', name: 'Stellar Group', email: 'admin@stellar.org', avatarUrl: 'https://placehold.co/40x40/E2E8F0/475569_text=SG', phone: '567-890-1234', rate: 1.8, address: { logradouro: '222 Stellar Rd', cidade: 'Galaxy Heights', estado: 'FL', cep: '97531' } },
 ];
 
-export const invoices: Invoice[] = [
+export const contracts: Contract[] = [
   {
-    id: 'INV001',
+    id: 'CON001',
     clientId: '1',
     clientName: 'Innovate Inc.',
     clientEmail: 'contact@innovate.com',
@@ -20,9 +21,11 @@ export const invoices: Invoice[] = [
     dueDate: '2024-06-01',
     status: 'paid',
     paymentDate: '2024-05-28',
+    interestRate: 1.5,
+    type: 'single',
   },
   {
-    id: 'INV002',
+    id: 'CON002',
     clientId: '2',
     clientName: 'Solutions Co.',
     clientEmail: 'hello@solutions.co',
@@ -31,9 +34,11 @@ export const invoices: Invoice[] = [
     dueDate: '2024-06-05',
     status: 'pending',
     paymentDate: null,
+    interestRate: 2.0,
+    type: 'installment',
   },
   {
-    id: 'INV003',
+    id: 'CON003',
     clientId: '3',
     clientName: 'Apex Enterprises',
     clientEmail: 'support@apex.com',
@@ -42,9 +47,11 @@ export const invoices: Invoice[] = [
     dueDate: '2024-05-10',
     status: 'overdue',
     paymentDate: null,
+    interestRate: 1.2,
+    type: 'single',
   },
   {
-    id: 'INV004',
+    id: 'CON004',
     clientId: '4',
     clientName: 'Quantum Dynamics',
     clientEmail: 'info@quantum.dev',
@@ -53,9 +60,11 @@ export const invoices: Invoice[] = [
     dueDate: '2024-06-15',
     status: 'pending',
     paymentDate: null,
+    interestRate: 2.5,
+    type: 'installment',
   },
   {
-    id: 'INV005',
+    id: 'CON005',
     clientId: '5',
     clientName: 'Stellar Group',
     clientEmail: 'admin@stellar.org',
@@ -64,9 +73,11 @@ export const invoices: Invoice[] = [
     dueDate: '2024-06-20',
     status: 'pending',
     paymentDate: null,
+    interestRate: 1.8,
+    type: 'single',
   },
   {
-    id: 'INV006',
+    id: 'CON006',
     clientId: '1',
     clientName: 'Innovate Inc.',
     clientEmail: 'contact@innovate.com',
@@ -75,9 +86,11 @@ export const invoices: Invoice[] = [
     dueDate: '2024-07-02',
     status: 'pending',
     paymentDate: null,
+    interestRate: 1.5,
+    type: 'installment',
   },
   {
-    id: 'INV007',
+    id: 'CON007',
     clientId: '2',
     clientName: 'Solutions Co.',
     clientEmail: 'hello@solutions.co',
@@ -86,9 +99,11 @@ export const invoices: Invoice[] = [
     dueDate: '2024-05-01',
     status: 'paid',
     paymentDate: '2024-04-25',
+    interestRate: 2.0,
+    type: 'single',
   },
    {
-    id: 'INV008',
+    id: 'CON008',
     clientId: '3',
     clientName: 'Apex Enterprises',
     clientEmail: 'support@apex.com',
@@ -97,9 +112,11 @@ export const invoices: Invoice[] = [
     dueDate: '2024-07-10',
     status: 'pending',
     paymentDate: null,
+    interestRate: 1.2,
+    type: 'installment',
   },
   {
-    id: 'INV009',
+    id: 'CON009',
     clientId: '4',
     clientName: 'Quantum Dynamics',
     clientEmail: 'info@quantum.dev',
@@ -108,9 +125,11 @@ export const invoices: Invoice[] = [
     dueDate: '2024-04-15',
     status: 'overdue',
     paymentDate: null,
+    interestRate: 2.5,
+    type: 'single',
   },
   {
-    id: 'INV010',
+    id: 'CON010',
     clientId: '5',
     clientName: 'Stellar Group',
     clientEmail: 'admin@stellar.org',
@@ -119,5 +138,7 @@ export const invoices: Invoice[] = [
     dueDate: '2024-03-20',
     status: 'paid',
     paymentDate: '2024-03-18',
+    interestRate: 1.8,
+    type: 'installment',
   },
 ];

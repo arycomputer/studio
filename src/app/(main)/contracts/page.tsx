@@ -3,10 +3,10 @@
 
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import {
-  getInvoices,
+  getContracts,
   getClients,
-  deleteInvoice,
-  updateInvoiceStatus,
+  deleteContract,
+  updateContractStatus,
 } from '@/actions';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,9 +17,9 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { PlusCircle, X, ListFilter } from 'lucide-react';
-import type { Invoice, Client, InvoiceStatus } from '@/lib/types';
-import { AddInvoiceForm } from './components/add-invoice-form';
-import { InvoiceDetailsSheet } from './components/invoice-details-sheet';
+import type { Contract, Client, ContractStatus } from '@/lib/types';
+import { AddContractForm } from './components/add-contract-form';
+import { ContractDetailsSheet } from './components/contract-details-sheet';
 import { useToast } from '@/hooks/use-toast';
 import {
   AlertDialog,
@@ -33,7 +33,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { format } from 'date-fns';
-import { InvoiceCard } from './components/invoice-card';
+import { ContractCard } from './components/contract-card';
 import { Input } from '@/components/ui/input';
 import {
   DropdownMenu,
@@ -46,27 +46,27 @@ import {
 import { CheckedState } from '@radix-ui/react-checkbox';
 
 const statusTranslations: { [key: string]: string } = {
-    paid: 'Pagas',
+    paid: 'Pagos',
     pending: 'Pendentes',
-    overdue: 'Atrasadas',
-    'written-off': 'Baixadas',
-    'pending,overdue': 'Pendentes e Atrasadas'
+    overdue: 'Atrasados',
+    'written-off': 'Baixados',
+    'pending,overdue': 'Pendentes e Atrasados'
 };
 
-const statusOptions: {id: InvoiceStatus, label: string}[] = [
+const statusOptions: {id: ContractStatus, label: string}[] = [
     {id: 'pending', label: 'Pendente'},
-    {id: 'overdue', label: 'Atrasada'},
-    {id: 'paid', label: 'Paga'},
-    {id: 'written-off', label: 'Baixada'},
+    {id: 'overdue', label: 'Atrasado'},
+    {id: 'paid', label: 'Pago'},
+    {id: 'written-off', label: 'Baixado'},
 ]
 
-function InvoicesPageContent() {
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
+function ContractsPageContent() {
+  const [contracts, setContracts] = useState<Contract[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isAddInvoiceOpen, setAddInvoiceOpen] = useState(false);
+  const [isAddContractOpen, setAddContractOpen] = useState(false);
   const [isDetailsSheetOpen, setDetailsSheetOpen] = useState(false);
-  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+  const [selectedContract, setSelectedContract] = useState<Contract | null>(null);
   const [isDeleteAlertOpen, setDeleteAlertOpen] = useState(false);
   const [filter, setFilter] = useState('');
   const { toast } = useToast();
@@ -84,37 +84,37 @@ function InvoicesPageContent() {
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
-      const [invoicesData, clientsData] = await Promise.all([
-        getInvoices(),
+      const [contractsData, clientsData] = await Promise.all([
+        getContracts(),
         getClients(),
       ]);
-      setInvoices(invoicesData);
+      setContracts(contractsData);
       setClients(clientsData);
       setLoading(false);
     }
     fetchData();
   }, []);
 
-  const baseFilteredInvoices = useMemo(() => {
-    let filtered = [...invoices];
+  const baseFilteredContracts = useMemo(() => {
+    let filtered = [...contracts];
     if (clientId) {
-        filtered = filtered.filter((invoice) => invoice.clientId === clientId);
+        filtered = filtered.filter((contract) => contract.clientId === clientId);
     }
     if (filterStatus) {
-        const statuses = filterStatus.split(',') as InvoiceStatus[];
-        filtered = filtered.filter((invoice) => statuses.includes(invoice.status));
+        const statuses = filterStatus.split(',') as ContractStatus[];
+        filtered = filtered.filter((contract) => statuses.includes(contract.status));
     }
     if (filterDueDate === 'today') {
         const today = format(new Date(), 'yyyy-MM-dd');
-        filtered = filtered.filter((invoice) => invoice.dueDate === today);
+        filtered = filtered.filter((contract) => contract.dueDate === today);
     }
     return filtered;
-  }, [invoices, clientId, filterStatus, filterDueDate]);
+  }, [contracts, clientId, filterStatus, filterDueDate]);
   
-  const filteredInvoices = useMemo(() => {
-      if (!filter) return baseFilteredInvoices;
-      return baseFilteredInvoices.filter(invoice => invoice.clientName.toLowerCase().includes(filter.toLowerCase()));
-  }, [baseFilteredInvoices, filter]);
+  const filteredContracts = useMemo(() => {
+      if (!filter) return baseFilteredContracts;
+      return baseFilteredContracts.filter(contract => contract.clientName.toLowerCase().includes(filter.toLowerCase()));
+  }, [baseFilteredContracts, filter]);
 
 
   const getFilterDescription = () => {
@@ -140,76 +140,76 @@ function InvoicesPageContent() {
   }
 
 
-  const handleInvoiceAdded = (newInvoice: Invoice) => {
-    setInvoices((prevInvoices) => [newInvoice, ...prevInvoices]);
+  const handleContractAdded = (newContract: Contract) => {
+    setContracts((prevContracts) => [newContract, ...prevContracts]);
   };
 
-  const handleInvoiceUpdated = (updatedInvoice: Invoice) => {
-    setInvoices((prevInvoices) =>
-      prevInvoices.map((invoice) =>
-        invoice.id === updatedInvoice.id ? updatedInvoice : invoice
+  const handleContractUpdated = (updatedContract: Contract) => {
+    setContracts((prevContracts) =>
+      prevContracts.map((contract) =>
+        contract.id === updatedContract.id ? updatedContract : contract
       )
     );
-    if (selectedInvoice && selectedInvoice.id === updatedInvoice.id) {
-      setSelectedInvoice(updatedInvoice);
+    if (selectedContract && selectedContract.id === updatedContract.id) {
+      setSelectedContract(updatedContract);
     }
   };
 
-  const handleViewDetails = (invoice: Invoice) => {
-    setSelectedInvoice(invoice);
+  const handleViewDetails = (contract: Contract) => {
+    setSelectedContract(contract);
     setDetailsSheetOpen(true);
   };
 
-  const handleDeleteClick = (invoice: Invoice) => {
-    setSelectedInvoice(invoice);
+  const handleDeleteClick = (contract: Contract) => {
+    setSelectedContract(contract);
     setDeleteAlertOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
-    if (!selectedInvoice) return;
+    if (!selectedContract) return;
     try {
-      await deleteInvoice(selectedInvoice.id);
-      setInvoices((prev) =>
-        prev.filter((inv) => inv.id !== selectedInvoice.id)
+      await deleteContract(selectedContract.id);
+      setContracts((prev) =>
+        prev.filter((inv) => inv.id !== selectedContract.id)
       );
       toast({
-        title: 'Fatura Excluída',
-        description: `A fatura ${selectedInvoice.id} foi excluída.`,
+        title: 'Contrato Excluído',
+        description: `O contrato ${selectedContract.id} foi excluído.`,
       });
     } catch (error) {
       toast({
         variant: 'destructive',
         title: 'Erro',
-        description: 'Falha ao excluir a fatura.',
+        description: 'Falha ao excluir o contrato.',
       });
     } finally {
       setDeleteAlertOpen(false);
-      setSelectedInvoice(null);
+      setSelectedContract(null);
     }
   };
 
-  const handleMarkAsPaid = async (invoiceId: string) => {
+  const handleMarkAsPaid = async (contractId: string) => {
     try {
-      const updatedInvoice = await updateInvoiceStatus(invoiceId, 'paid');
-      handleInvoiceUpdated(updatedInvoice);
+      const updatedContract = await updateContractStatus(contractId, 'paid');
+      handleContractUpdated(updatedContract);
       toast({
-        title: 'Fatura Atualizada',
-        description: `Fatura ${invoiceId} marcada como paga.`,
+        title: 'Contrato Atualizado',
+        description: `Contrato ${contractId} marcado como pago.`,
       });
     } catch (error) {
       toast({
         variant: 'destructive',
         title: 'Erro',
-        description: 'Falha ao atualizar o status da fatura.',
+        description: 'Falha ao atualizar o status do contrato.',
       });
     }
   };
 
   const clearFilter = () => {
-    router.push('/invoices');
+    router.push('/contracts');
   };
 
-  const handleStatusFilterChange = (status: InvoiceStatus) => (checked: CheckedState) => {
+  const handleStatusFilterChange = (status: ContractStatus) => (checked: CheckedState) => {
     const currentStatuses = filterStatus ? filterStatus.split(',') : [];
     let newStatuses: string[];
 
@@ -225,23 +225,23 @@ function InvoicesPageContent() {
     } else {
       params.delete('status');
     }
-    router.push(`/invoices?${params.toString()}`);
+    router.push(`/contracts?${params.toString()}`);
   };
 
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-headline font-bold">Faturas</h1>
-        <Button onClick={() => setAddInvoiceOpen(true)}>
+        <h1 className="text-3xl font-headline font-bold">Contratos</h1>
+        <Button onClick={() => setAddContractOpen(true)}>
           <PlusCircle className="mr-2 h-4 w-4" />
-          Criar Fatura
+          Criar Contrato
         </Button>
       </div>
 
       {(clientId || filterStatus || filterDueDate) && (
         <div className="flex items-center gap-2 rounded-lg border bg-secondary/50 p-3">
           <span className="text-sm">
-            Mostrando faturas {getFilterDescription()}
+            Mostrando contratos {getFilterDescription()}
           </span>
           <Button
             variant="ghost"
@@ -255,19 +255,19 @@ function InvoicesPageContent() {
         </div>
       )}
 
-      <AddInvoiceForm
-        isOpen={isAddInvoiceOpen}
-        onOpenChange={setAddInvoiceOpen}
-        onInvoiceAdded={handleInvoiceAdded}
+      <AddContractForm
+        isOpen={isAddContractOpen}
+        onOpenChange={setAddContractOpen}
+        onContractAdded={handleContractAdded}
         clients={clients}
       />
 
-      {selectedInvoice && (
-        <InvoiceDetailsSheet
+      {selectedContract && (
+        <ContractDetailsSheet
           isOpen={isDetailsSheetOpen}
           onOpenChange={setDetailsSheetOpen}
-          invoice={selectedInvoice}
-          onInvoiceUpdated={handleInvoiceUpdated}
+          contract={selectedContract}
+          onContractUpdated={handleContractUpdated}
           clients={clients}
         />
       )}
@@ -277,8 +277,8 @@ function InvoicesPageContent() {
           <AlertDialogHeader>
             <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta ação não pode ser desfeita. Isso excluirá permanentemente a
-              fatura.
+              Esta ação não pode ser desfeita. Isso excluirá permanentemente o
+              contrato.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -293,9 +293,9 @@ function InvoicesPageContent() {
       <Card>
         <CardHeader className="flex-col sm:flex-row sm:items-center sm:justify-between">
             <div className='space-y-1.5'>
-                <CardTitle className="font-headline">Histórico de Faturas</CardTitle>
+                <CardTitle className="font-headline">Histórico de Contratos</CardTitle>
                 <CardDescription>
-                    Veja e gerencie todas as suas faturas.
+                    Veja e gerencie todos os seus contratos.
                 </CardDescription>
             </div>
             <div className="flex items-center gap-2 pt-2 sm:pt-0">
@@ -330,15 +330,15 @@ function InvoicesPageContent() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <p>Carregando faturas...</p>
+            <p>Carregando contratos...</p>
           ) : (
              <div className="space-y-4">
-              {filteredInvoices.length > 0 ? (
+              {filteredContracts.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {filteredInvoices.map(invoice => (
-                    <InvoiceCard 
-                        key={invoice.id}
-                        invoice={invoice}
+                {filteredContracts.map(contract => (
+                    <ContractCard 
+                        key={contract.id}
+                        contract={contract}
                         onViewDetails={handleViewDetails}
                         onMarkAsPaid={handleMarkAsPaid}
                         onDelete={handleDeleteClick}
@@ -346,7 +346,7 @@ function InvoicesPageContent() {
                 ))}
                 </div>
               ) : (
-                 <p className="text-center text-muted-foreground pt-4">Nenhuma fatura encontrada.</p>
+                 <p className="text-center text-muted-foreground pt-4">Nenhum contrato encontrado.</p>
               )}
             </div>
           )}
@@ -356,10 +356,10 @@ function InvoicesPageContent() {
   );
 }
 
-export default function InvoicesPage() {
+export default function ContractsPage() {
   return (
     <Suspense fallback={<div>Carregando...</div>}>
-      <InvoicesPageContent />
+      <ContractsPageContent />
     </Suspense>
   );
 }

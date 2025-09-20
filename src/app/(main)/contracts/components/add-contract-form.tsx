@@ -36,13 +36,14 @@ import {
 } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { useToast } from '@/hooks/use-toast';
-import { addInvoice } from '@/actions';
+import { addContract } from '@/actions';
 import { useState } from 'react';
 import { CalendarIcon, Loader2 } from 'lucide-react';
-import type { Client, Invoice } from '@/lib/types';
+import type { Client, Contract, ContractType } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 const formSchema = z.object({
   clientId: z.string().min(1, 'Por favor, selecione um cliente.'),
@@ -50,21 +51,23 @@ const formSchema = z.object({
   dueDate: z.date({
     required_error: 'A data de vencimento é obrigatória.',
   }),
+  interestRate: z.coerce.number({invalid_type_error: "A taxa deve ser um número."}).min(0, 'A taxa de juros não pode ser negativa.'),
+  type: z.enum(['single', 'installment'], {required_error: 'Por favor, selecione o tipo de contrato.'}),
 });
 
-type AddInvoiceFormProps = {
+type AddContractFormProps = {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
-  onInvoiceAdded: (invoice: Invoice) => void;
+  onContractAdded: (contract: Contract) => void;
   clients: Client[];
 };
 
-export function AddInvoiceForm({
+export function AddContractForm({
   isOpen,
   onOpenChange,
-  onInvoiceAdded,
+  onContractAdded,
   clients,
-}: AddInvoiceFormProps) {
+}: AddContractFormProps) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -73,21 +76,22 @@ export function AddInvoiceForm({
     defaultValues: {
       clientId: '',
       amount: 0,
+      interestRate: 0,
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     try {
-      const invoiceData = {
+      const contractData = {
         ...values,
         dueDate: format(values.dueDate, 'yyyy-MM-dd'),
       };
-      const newInvoice = await addInvoice(invoiceData);
-      onInvoiceAdded(newInvoice);
+      const newContract = await addContract(contractData);
+      onContractAdded(newContract);
       toast({
         title: 'Sucesso!',
-        description: 'Nova fatura criada.',
+        description: 'Novo contrato criado.',
       });
       form.reset();
       onOpenChange(false);
@@ -95,7 +99,7 @@ export function AddInvoiceForm({
       toast({
         variant: 'destructive',
         title: 'Erro',
-        description: 'Não foi possível criar a fatura. Tente novamente.',
+        description: 'Não foi possível criar o contrato. Tente novamente.',
       });
     } finally {
       setIsSubmitting(false);
@@ -111,15 +115,15 @@ export function AddInvoiceForm({
     }}>
       <DialogContent className="sm:max-w-md max-h-[90svh] flex flex-col">
         <DialogHeader className="px-6 pt-6">
-          <DialogTitle>Criar Nova Fatura</DialogTitle>
+          <DialogTitle>Criar Novo Contrato</DialogTitle>
           <DialogDescription>
-            Preencha os detalhes abaixo para criar uma nova fatura.
+            Preencha os detalhes abaixo para criar um novo contrato.
           </DialogDescription>
         </DialogHeader>
         <div className='flex-1 overflow-hidden'>
           <ScrollArea className="h-full px-6">
             <Form {...form}>
-              <form id="add-invoice-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 py-4 pr-2">
+              <form id="add-contract-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 py-4 pr-2">
                 <FormField
                   control={form.control}
                   name="clientId"
@@ -152,6 +156,53 @@ export function AddInvoiceForm({
                       <FormLabel>Valor</FormLabel>
                       <FormControl>
                         <Input type="number" placeholder="0.00" step="0.01" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="interestRate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Taxa Mensal de Juros (%)</FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder="1.0" step="0.1" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="type"
+                  render={({ field }) => (
+                    <FormItem className="space-y-3">
+                      <FormLabel>Tipo de Contrato</FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          className="flex flex-col space-y-1"
+                        >
+                          <FormItem className="flex items-center space-x-3 space-y-0">
+                            <FormControl>
+                              <RadioGroupItem value="single" />
+                            </FormControl>
+                            <FormLabel className="font-normal">
+                              Parcela Única
+                            </FormLabel>
+                          </FormItem>
+                          <FormItem className="flex items-center space-x-3 space-y-0">
+                            <FormControl>
+                              <RadioGroupItem value="installment" />
+                            </FormControl>
+                            <FormLabel className="font-normal">
+                              Parcelado
+                            </FormLabel>
+                          </FormItem>
+                        </RadioGroup>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -209,11 +260,11 @@ export function AddInvoiceForm({
           >
             Cancelar
           </Button>
-          <Button type="submit" form="add-invoice-form" disabled={isSubmitting}>
+          <Button type="submit" form="add-contract-form" disabled={isSubmitting}>
             {isSubmitting ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : null}
-            Criar Fatura
+            Criar Contrato
           </Button>
         </DialogFooter>
       </DialogContent>

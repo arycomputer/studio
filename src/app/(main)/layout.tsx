@@ -1,4 +1,5 @@
 
+
 import {
   SidebarProvider,
   Sidebar,
@@ -53,10 +54,10 @@ export default function MainLayout({
                 </a>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <a href="/invoices">
-                  <SidebarMenuButton tooltip="Faturas">
+                <a href="/contracts">
+                  <SidebarMenuButton tooltip="Contratos">
                     <FileText />
-                    <span>Faturas</span>
+                    <span>Contratos</span>
                   </SidebarMenuButton>
                 </a>
               </SidebarMenuItem>
@@ -101,3 +102,4 @@ export default function MainLayout({
     </SidebarProvider>
   );
 }
+

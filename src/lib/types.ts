@@ -26,9 +26,10 @@ export type Client = {
   address?: ClientAddress;
 };
 
-export type InvoiceStatus = 'paid' | 'pending' | 'overdue' | 'written-off';
+export type ContractStatus = 'paid' | 'pending' | 'overdue' | 'written-off';
+export type ContractType = 'single' | 'installment';
 
-export type Invoice = {
+export type Contract = {
   id: string;
   clientId: string;
   clientName: string;
@@ -36,8 +37,10 @@ export type Invoice = {
   amount: number;
   issueDate: string;
   dueDate: string;
-  status: InvoiceStatus;
+  status: ContractStatus;
   paymentDate: string | null;
+  interestRate: number;
+  type: ContractType;
 };
 
     

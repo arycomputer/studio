@@ -24,12 +24,12 @@ import {
   Activity,
   AlertTriangle,
 } from 'lucide-react';
-import { getInvoices, getClients } from '@/actions';
+import { getContracts, getClients } from '@/actions';
 import { RevenueChart } from './revenue-chart';
 import { format } from 'date-fns';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import type { Invoice, Client } from '@/lib/types';
+import type { Contract, Client } from '@/lib/types';
 
 const statusTranslations: { [key: string]: string } = {
   paid: 'Paga',
@@ -39,18 +39,18 @@ const statusTranslations: { [key: string]: string } = {
 };
 
 export function DashboardClientContent() {
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [contracts, setContracts] = useState<Contract[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
-      const [invoicesData, clientsData] = await Promise.all([
-        getInvoices(),
+      const [contractsData, clientsData] = await Promise.all([
+        getContracts(),
         getClients(),
       ]);
-      setInvoices(invoicesData);
+      setContracts(contractsData);
       setClients(clientsData);
       setLoading(false);
     }
@@ -61,25 +61,25 @@ export function DashboardClientContent() {
     return <div className="flex justify-center items-center h-full"><p>Carregando dados...</p></div>;
   }
   
-  const totalRevenue = invoices
-    .filter((invoice) => invoice.status === 'paid')
-    .reduce((sum, invoice) => sum + invoice.amount, 0);
+  const totalRevenue = contracts
+    .filter((contract) => contract.status === 'paid')
+    .reduce((sum, contract) => sum + contract.amount, 0);
 
-  const outstandingRevenue = invoices
-    .filter((invoice) => invoice.status === 'pending' || invoice.status === 'overdue')
-    .reduce((sum, invoice) => sum + invoice.amount, 0);
+  const outstandingRevenue = contracts
+    .filter((contract) => contract.status === 'pending' || contract.status === 'overdue')
+    .reduce((sum, contract) => sum + contract.amount, 0);
 
-  const recentInvoices = invoices.slice(0, 5);
+  const recentContracts = contracts.slice(0, 5);
 
   const today = format(new Date(), 'yyyy-MM-dd');
-  const dueToday = invoices.filter(invoice => invoice.dueDate === today && invoice.status !== 'paid');
+  const dueToday = contracts.filter(contract => contract.dueDate === today && contract.status !== 'paid');
 
 
   return (
     <div className="flex flex-col gap-8">
       <h1 className="text-3xl font-headline font-bold">Painel</h1>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Link href="/invoices?status=paid">
+        <Link href="/contracts?status=paid">
             <Card className="hover:bg-muted/50 transition-colors">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Receita Total</CardTitle>
@@ -90,12 +90,12 @@ export function DashboardClientContent() {
                 {totalRevenue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                Receita de todos os tempos de faturas pagas.
+                Receita de todos os tempos de contratos pagos.
                 </p>
             </CardContent>
             </Card>
         </Link>
-        <Link href="/invoices?status=pending,overdue">
+        <Link href="/contracts?status=pending,overdue">
             <Card className="hover:bg-muted/50 transition-colors">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
@@ -108,7 +108,7 @@ export function DashboardClientContent() {
                  {outstandingRevenue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                De faturas pendentes e vencidas.
+                De contratos pendentes e vencidos.
                 </p>
             </CardContent>
             </Card>
@@ -127,16 +127,16 @@ export function DashboardClientContent() {
             </CardContent>
             </Card>
         </Link>
-        <Link href="/invoices">
+        <Link href="/contracts">
             <Card className="hover:bg-muted/50 transition-colors">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Faturas Totais</CardTitle>
+                <CardTitle className="text-sm font-medium">Contratos Totais</CardTitle>
                 <Activity className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-                <div className="text-2xl font-bold">{invoices.length}</div>
+                <div className="text-2xl font-bold">{contracts.length}</div>
                 <p className="text-xs text-muted-foreground">
-                Total de faturas geradas.
+                Total de contratos gerados.
                 </p>
             </CardContent>
             </Card>
@@ -149,11 +149,11 @@ export function DashboardClientContent() {
             <CardTitle className="font-headline">Visão Geral</CardTitle>
           </CardHeader>
           <CardContent className="pl-2">
-            <RevenueChart invoices={invoices} />
+            <RevenueChart contracts={contracts} />
           </CardContent>
         </Card>
         <div className="lg:col-span-3 flex flex-col gap-4">
-            <Link href="/invoices?dueDate=today">
+            <Link href="/contracts?dueDate=today">
                 <Card className="hover:bg-muted/50 transition-colors">
                     <CardHeader>
                         <CardTitle className="font-headline flex items-center gap-2">
@@ -161,7 +161,7 @@ export function DashboardClientContent() {
                             Vencimentos do Dia
                         </CardTitle>
                         <CardDescription>
-                            Faturas que precisam de atenção imediata.
+                            Contratos que precisam de atenção imediata.
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -175,13 +175,13 @@ export function DashboardClientContent() {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {dueToday.map((invoice) => (
-                                    <TableRow key={invoice.id}>
+                                    {dueToday.map((contract) => (
+                                    <TableRow key={contract.id}>
                                         <TableCell className='py-2'>
-                                        <div className="font-medium">{invoice.clientName}</div>
+                                        <div className="font-medium">{contract.clientName}</div>
                                         </TableCell>
                                         <TableCell className="text-right py-2">
-                                        {invoice.amount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                        {contract.amount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                         </TableCell>
                                     </TableRow>
                                     ))}
@@ -189,16 +189,16 @@ export function DashboardClientContent() {
                             </Table>
                         </div>
                         ) : (
-                        <p className="text-sm text-muted-foreground">Nenhuma fatura vence hoje.</p>
+                        <p className="text-sm text-muted-foreground">Nenhum contrato vence hoje.</p>
                         )}
                     </CardContent>
                 </Card>
             </Link>
             <Card>
             <CardHeader>
-                <CardTitle className="font-headline">Faturas Recentes</CardTitle>
+                <CardTitle className="font-headline">Contratos Recentes</CardTitle>
                 <CardDescription>
-                As faturas criadas mais recentemente.
+                Os contratos criados mais recentemente.
                 </CardDescription>
             </CardHeader>
             <CardContent>
@@ -212,30 +212,30 @@ export function DashboardClientContent() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {recentInvoices.map((invoice) => (
-                        <TableRow key={invoice.id}>
+                        {recentContracts.map((contract) => (
+                        <TableRow key={contract.id}>
                             <TableCell>
-                            <div className="font-medium">{invoice.clientName}</div>
+                            <div className="font-medium">{contract.clientName}</div>
                             <div className="text-sm text-muted-foreground truncate max-w-[120px] sm:max-w-none">
-                                {invoice.clientEmail}
+                                {contract.clientEmail}
                             </div>
                             </TableCell>
                             <TableCell>
                             <Badge
                                 variant={
-                                invoice.status === 'paid'
+                                contract.status === 'paid'
                                     ? 'success'
-                                    : invoice.status === 'overdue'
+                                    : contract.status === 'overdue'
                                     ? 'destructive'
                                     : 'secondary'
                                 }
                                 className="capitalize"
                             >
-                                {statusTranslations[invoice.status]}
+                                {statusTranslations[contract.status]}
                             </Badge>
                             </TableCell>
                             <TableCell className="text-right">
-                            {invoice.amount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                            {contract.amount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                             </TableCell>
                         </TableRow>
                         ))}

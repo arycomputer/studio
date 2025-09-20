@@ -11,44 +11,44 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import type { Invoice } from '@/lib/types';
+import type { Contract } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { MoreHorizontal } from 'lucide-react';
 import { format } from 'date-fns';
 
 const statusTranslations: { [key: string]: string } = {
-  paid: 'Paga',
+  paid: 'Pago',
   pending: 'Pendente',
-  overdue: 'Atrasada',
-  'written-off': 'Baixada',
+  overdue: 'Atrasado',
+  'written-off': 'Baixado',
 };
 
 type GetColumnsProps = {
-  invoice: Invoice;
-  onViewDetails: (invoice: Invoice) => void;
-  onMarkAsPaid: (invoiceId: string) => void;
-  onDelete: (invoice: Invoice) => void;
+  contract: Contract;
+  onViewDetails: (contract: Contract) => void;
+  onMarkAsPaid: (contractId: string) => void;
+  onDelete: (contract: Contract) => void;
 };
 
-export function InvoiceCard({ invoice, onViewDetails, onMarkAsPaid, onDelete }: GetColumnsProps) {
+export function ContractCard({ contract, onViewDetails, onMarkAsPaid, onDelete }: GetColumnsProps) {
     const formattedAmount = new Intl.NumberFormat('pt-BR', {
         style: 'currency',
         currency: 'BRL',
-    }).format(invoice.amount);
+    }).format(contract.amount);
 
-    const dueDate = new Date(invoice.dueDate);
+    const dueDate = new Date(contract.dueDate);
     // Adjust for timezone offset to show correct date
     dueDate.setMinutes(dueDate.getMinutes() + dueDate.getTimezoneOffset());
     const formattedDueDate = format(dueDate, 'dd/MM/yyyy');
 
     return (
         <Card 
-            className={cn("w-full cursor-pointer", invoice.status === 'overdue' && "border-destructive")}
-            onDoubleClick={() => onViewDetails(invoice)}
+            className={cn("w-full cursor-pointer", contract.status === 'overdue' && "border-destructive")}
+            onDoubleClick={() => onViewDetails(contract)}
         >
              <CardHeader className="flex flex-row items-start justify-between p-4 pb-2">
                 <div>
-                    <CardTitle className="text-base font-semibold">{invoice.clientName}</CardTitle>
+                    <CardTitle className="text-base font-semibold">{contract.clientName}</CardTitle>
                     <p className="text-xs text-muted-foreground">Vencimento: {formattedDueDate}</p>
                 </div>
                  <DropdownMenu>
@@ -60,17 +60,17 @@ export function InvoiceCard({ invoice, onViewDetails, onMarkAsPaid, onDelete }: 
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => onViewDetails(invoice)}>
+                        <DropdownMenuItem onClick={() => onViewDetails(contract)}>
                         Ver Detalhes
                         </DropdownMenuItem>
-                        {invoice.status !== 'paid' && (
-                        <DropdownMenuItem onClick={() => onMarkAsPaid(invoice.id)}>
-                            Marcar como Paga
+                        {contract.status !== 'paid' && (
+                        <DropdownMenuItem onClick={() => onMarkAsPaid(contract.id)}>
+                            Marcar como Pago
                         </DropdownMenuItem>
                         )}
                         <DropdownMenuItem
                         className="text-destructive"
-                        onClick={() => onDelete(invoice)}
+                        onClick={() => onDelete(contract)}
                         >
                         Excluir
                         </DropdownMenuItem>
@@ -80,15 +80,15 @@ export function InvoiceCard({ invoice, onViewDetails, onMarkAsPaid, onDelete }: 
             <CardContent className="p-4 pt-0">
                  <Badge
                     variant={
-                        invoice.status === 'paid'
+                        contract.status === 'paid'
                         ? 'success'
-                        : invoice.status === 'overdue'
+                        : contract.status === 'overdue'
                         ? 'destructive'
                         : 'secondary'
                     }
                     className="capitalize"
                     >
-                    {statusTranslations[invoice.status]}
+                    {statusTranslations[contract.status]}
                 </Badge>
             </CardContent>
              <CardFooter className="flex justify-between bg-muted/50 p-4 text-sm">

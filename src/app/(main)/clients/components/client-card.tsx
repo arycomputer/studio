@@ -26,10 +26,10 @@ type ClientCardProps = {
   client: ClientData;
   onEdit: (client: Client) => void;
   onDelete: (client: Client) => void;
-  onViewInvoices: (client: Client) => void;
+  onViewContracts: (client: Client) => void;
 };
 
-export function ClientCard({ client, onEdit, onDelete, onViewInvoices }: ClientCardProps) {
+export function ClientCard({ client, onEdit, onDelete, onViewContracts }: ClientCardProps) {
     const formattedBalance = new Intl.NumberFormat('pt-BR', {
         style: 'currency',
         currency: 'BRL',
@@ -63,8 +63,8 @@ export function ClientCard({ client, onEdit, onDelete, onViewInvoices }: ClientC
                         <DropdownMenuItem onClick={() => onEdit(client)}>
                         Editar
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onViewInvoices(client)}>
-                        Ver Faturas
+                        <DropdownMenuItem onClick={() => onViewContracts(client)}>
+                        Ver Contratos
                         </DropdownMenuItem>
                         <DropdownMenuItem
                         className="text-destructive"

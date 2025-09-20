@@ -2,7 +2,7 @@
 'use client';
 
 import { Suspense, useEffect, useMemo, useState } from 'react';
-import { deleteClient, getClients, getInvoices } from '@/actions';
+import { deleteClient, getClients, getContracts } from '@/actions';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { PlusCircle, X } from 'lucide-react';
-import type { Client, Invoice } from '@/lib/types';
+import type { Client, Contract } from '@/lib/types';
 import { AddClientForm } from './components/add-client-form';
 import { EditClientForm } from './components/edit-client-form';
 import {
@@ -40,7 +40,7 @@ const statusTranslations: { [key: string]: string } = {
 
 function ClientsPageContent() {
   const [clients, setClients] = useState<Client[]>([]);
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [contracts, setContracts] = useState<Contract[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAddClientOpen, setAddClientOpen] = useState(false);
   const [isEditClientOpen, setEditClientOpen] = useState(false);
@@ -56,12 +56,12 @@ function ClientsPageContent() {
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
-      const [clientsData, invoicesData] = await Promise.all([
+      const [clientsData, contractsData] = await Promise.all([
         getClients(),
-        getInvoices(),
+        getContracts(),
       ]);
       setClients(clientsData);
-      setInvoices(invoicesData);
+      setContracts(contractsData);
       setLoading(false);
     }
     fetchData();
@@ -89,8 +89,8 @@ function ClientsPageContent() {
     setDeleteAlertOpen(true);
   };
 
-  const handleViewInvoicesClick = (client: Client) => {
-    router.push(`/invoices?clientId=${client.id}`);
+  const handleViewContractsClick = (client: Client) => {
+    router.push(`/contracts?clientId=${client.id}`);
   };
 
   const handleDeleteConfirm = async () => {
@@ -134,18 +134,18 @@ function ClientsPageContent() {
   };
 
   const clientData = useMemo(() => clients.map((client) => {
-    const clientInvoices = invoices.filter((inv) => inv.clientId === client.id);
-    const totalInvoiced = clientInvoices.reduce(
+    const clientContracts = contracts.filter((inv) => inv.clientId === client.id);
+    const totalInvoiced = clientContracts.reduce(
       (sum, inv) => sum + inv.amount,
       0
     );
-    const totalPaid = clientInvoices
+    const totalPaid = clientContracts
       .filter((inv) => inv.status === 'paid')
       .reduce((sum, inv) => sum + inv.amount, 0);
     const balance = totalInvoiced - totalPaid;
-    const isOverdue = clientInvoices.some(inv => inv.status === 'overdue');
+    const isOverdue = clientContracts.some(inv => inv.status === 'overdue');
     return { ...client, totalInvoiced, totalPaid, balance, isOverdue };
-  }), [clients, invoices]);
+  }), [clients, contracts]);
 
   const filteredData = useMemo(() => {
     let baseData = [...clientData];
@@ -270,7 +270,7 @@ function ClientsPageContent() {
                         client={client}
                         onEdit={handleEditClick}
                         onDelete={handleDeleteClick}
-                        onViewInvoices={handleViewInvoicesClick}
+                        onViewContracts={handleViewContractsClick}
                     />
                 ))}
                 </div>

@@ -1,8 +1,8 @@
 
 'use server';
 
-import { invoices as mockInvoices, clients as mockClients } from '@/lib/data';
-import { Client, Invoice, InvoiceStatus, ClientDocument, ClientAddress } from '@/lib/types';
+import { contracts as mockContracts, clients as mockClients } from '@/lib/data';
+import { Client, Contract, ContractStatus, ClientDocument, ClientAddress } from '@/lib/types';
 import {format} from 'date-fns';
 
 // Simulate a delay to mimic real-world network latency
@@ -36,19 +36,19 @@ export async function getAddressFromCEP(cep: string): Promise<Partial<ClientAddr
 }
 
 
-export async function getInvoices(): Promise<Invoice[]> {
+export async function getContracts(): Promise<Contract[]> {
   // In a real app, you'd fetch this from a database.
   await delay(200);
   // Ensure status is updated based on due date
   const today = new Date();
   today.setHours(0,0,0,0);
-  mockInvoices.forEach(inv => {
+  mockContracts.forEach(inv => {
     const dueDate = new Date(inv.dueDate);
     if (inv.status === 'pending' && dueDate < today) {
         inv.status = 'overdue';
     }
   });
-  return mockInvoices;
+  return mockContracts;
 }
 
 export async function getClients(): Promise<Client[]> {
@@ -139,12 +139,12 @@ export async function deleteClient(id: string): Promise<{ success: boolean }> {
         throw new Error('Client not found');
     }
     mockClients.splice(clientIndex, 1);
-    // Also delete associated invoices
-    const invoicesToDelete = mockInvoices.filter(inv => inv.clientId === id);
-    invoicesToDelete.forEach(inv => {
-        const invIndex = mockInvoices.findIndex(i => i.id === inv.id);
+    // Also delete associated contracts
+    const contractsToDelete = mockContracts.filter(inv => inv.clientId === id);
+    contractsToDelete.forEach(inv => {
+        const invIndex = mockContracts.findIndex(i => i.id === inv.id);
         if (invIndex !== -1) {
-            mockInvoices.splice(invIndex, 1);
+            mockContracts.splice(invIndex, 1);
         }
     });
     return { success: true };
@@ -169,24 +169,24 @@ export async function deleteClientDocument(clientId: string, documentUrl: string
 }
 
 
-export async function addInvoice(invoice: Omit<Invoice, 'id' | 'clientName' | 'clientEmail' | 'issueDate' | 'status' | 'paymentDate' >): Promise<Invoice> {
+export async function addContract(contract: Omit<Contract, 'id' | 'clientName' | 'clientEmail' | 'issueDate' | 'status' | 'paymentDate' >): Promise<Contract> {
     await delay(500);
-    const client = mockClients.find(c => c.id === invoice.clientId);
+    const client = mockClients.find(c => c.id === contract.clientId);
     if (!client) {
         throw new Error('Client not found');
     }
 
-    const newId = `INV${(mockInvoices.length + 1).toString().padStart(3, '0')}`;
+    const newId = `CON${(mockContracts.length + 1).toString().padStart(3, '0')}`;
     const issueDate = new Date();
-    const dueDate = new Date(invoice.dueDate);
+    const dueDate = new Date(contract.dueDate);
     
     // Set time to 0 to compare dates correctly
     issueDate.setHours(0,0,0,0);
     dueDate.setHours(0,0,0,0);
 
 
-    const newInvoice: Invoice = {
-        ...invoice,
+    const newContract: Contract = {
+        ...contract,
         id: newId,
         clientName: client.name,
         clientEmail: client.email,
@@ -195,41 +195,42 @@ export async function addInvoice(invoice: Omit<Invoice, 'id' | 'clientName' | 'c
         status: dueDate < issueDate ? 'overdue' : 'pending',
         paymentDate: null,
     };
-    mockInvoices.unshift(newInvoice);
-    return newInvoice;
+    mockContracts.unshift(newContract);
+    return newContract;
 }
 
 
-export async function updateInvoiceStatus(id: string, status: InvoiceStatus): Promise<Invoice> {
+export async function updateContractStatus(id: string, status: ContractStatus): Promise<Contract> {
     await delay(500);
-    const invoiceIndex = mockInvoices.findIndex(inv => inv.id === id);
-    if (invoiceIndex === -1) {
-        throw new Error('Invoice not found');
+    const contractIndex = mockContracts.findIndex(inv => inv.id === id);
+    if (contractIndex === -1) {
+        throw new Error('Contract not found');
     }
-    mockInvoices[invoiceIndex].status = status;
+    mockContracts[contractIndex].status = status;
     if (status === 'paid') {
-        mockInvoices[invoiceIndex].paymentDate = format(new Date(), 'yyyy-MM-dd');
+        mockContracts[contractIndex].paymentDate = format(new Date(), 'yyyy-MM-dd');
     } else {
-        mockInvoices[invoiceIndex].paymentDate = null;
+        mockContracts[contractIndex].paymentDate = null;
     }
     // Re-check overdue status in case of manual update
     const today = new Date();
     today.setHours(0,0,0,0);
-    const dueDate = new Date(mockInvoices[invoiceIndex].dueDate);
-    if (mockInvoices[invoiceIndex].status === 'pending' && dueDate < today) {
-        mockInvoices[invoiceIndex].status = 'overdue';
+    const dueDate = new Date(mockContracts[contractIndex].dueDate);
+    if (mockContracts[contractIndex].status === 'pending' && dueDate < today) {
+        mockContracts[contractIndex].status = 'overdue';
     }
 
-    return mockInvoices[invoiceIndex];
+    return mockContracts[contractIndex];
 }
 
 
-export async function deleteInvoice(id: string): Promise<{ success: boolean }> {
+export async function deleteContract(id: string): Promise<{ success: boolean }> {
     await delay(500);
-    const invoiceIndex = mockInvoices.findIndex(inv => inv.id === id);
-    if (invoiceIndex === -1) {
-        throw new Error('Invoice not found');
+    const contractIndex = mockContracts.findIndex(inv => inv.id === id);
+    if (contractIndex === -1) {
+        throw new Error('Contract not found');
     }
-    mockInvoices.splice(invoiceIndex, 1);
+    mockContracts.splice(contractIndex, 1);
     return { success: true };
 }
+
