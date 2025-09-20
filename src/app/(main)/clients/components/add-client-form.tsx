@@ -475,7 +475,7 @@ export function AddClientForm({
             </Form>
           </ScrollArea>
         </div>
-        <DialogFooter className="border-t pt-4 -mx-6 px-6">
+        <DialogFooter className="pt-4 border-t">
           <Button
             type="button"
             variant="outline"
@@ -495,5 +495,3 @@ export function AddClientForm({
     </Dialog>
   );
 }
-
-    
