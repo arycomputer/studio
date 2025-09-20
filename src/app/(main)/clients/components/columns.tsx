@@ -49,7 +49,7 @@ export const getColumns = ({
           <div>
             <div>{client.name}</div>
             <div className="text-sm text-muted-foreground">
-              Juros: {client.rate}%
+              Taxa Padrão: {client.rate}%
             </div>
           </div>
         </div>

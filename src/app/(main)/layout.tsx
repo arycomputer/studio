@@ -19,6 +19,7 @@ import {
   Settings,
   Briefcase,
   PanelLeft,
+  Receipt,
 } from 'lucide-react';
 import Link from 'next/link';
 import { UserNav } from '@/components/user-nav';
@@ -33,7 +34,7 @@ export default function MainLayout({
 }) {
   return (
     <SidebarProvider>
-      <div className="flex h-screen min-h-screen">
+      <div className="flex min-h-screen h-screen">
         <Sidebar collapsible="icon" className="border-r">
           <SidebarHeader>
             <div className="flex items-center gap-2 p-2">
@@ -58,6 +59,14 @@ export default function MainLayout({
                   <SidebarMenuButton tooltip="Contratos">
                     <FileText />
                     <span>Contratos</span>
+                  </SidebarMenuButton>
+                </a>
+              </SidebarMenuItem>
+               <SidebarMenuItem>
+                <a href="/invoices">
+                  <SidebarMenuButton tooltip="Faturas">
+                    <Receipt />
+                    <span>Faturas</span>
                   </SidebarMenuButton>
                 </a>
               </SidebarMenuItem>

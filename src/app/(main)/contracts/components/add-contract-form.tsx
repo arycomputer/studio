@@ -49,10 +49,19 @@ const formSchema = z.object({
   clientId: z.string().min(1, 'Por favor, selecione um cliente.'),
   amount: z.coerce.number({invalid_type_error: "O valor deve ser um número."}).min(0.01, 'O valor deve ser maior que zero.'),
   dueDate: z.date({
-    required_error: 'A data de vencimento é obrigatória.',
+    required_error: 'A data do primeiro vencimento é obrigatória.',
   }),
   interestRate: z.coerce.number({invalid_type_error: "A taxa deve ser um número."}).min(0, 'A taxa de juros não pode ser negativa.'),
   type: z.enum(['single', 'installment'], {required_error: 'Por favor, selecione o tipo de contrato.'}),
+  installments: z.coerce.number().optional(),
+}).refine(data => {
+    if (data.type === 'installment' && (!data.installments || data.installments <= 1)) {
+        return false;
+    }
+    return true;
+}, {
+    message: 'O número de parcelas deve ser maior que 1.',
+    path: ['installments'],
 });
 
 type AddContractFormProps = {
@@ -77,8 +86,11 @@ export function AddContractForm({
       clientId: '',
       amount: 0,
       interestRate: 0,
+      type: 'single',
     },
   });
+
+  const contractType = form.watch('type');
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
@@ -153,7 +165,7 @@ export function AddContractForm({
                   name="amount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Valor</FormLabel>
+                      <FormLabel>Valor Total</FormLabel>
                       <FormControl>
                         <Input type="number" placeholder="0.00" step="0.01" {...field} />
                       </FormControl>
@@ -184,9 +196,9 @@ export function AddContractForm({
                         <RadioGroup
                           onValueChange={field.onChange}
                           defaultValue={field.value}
-                          className="flex flex-col space-y-1"
+                          className="flex space-x-4"
                         >
-                          <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormItem className="flex items-center space-x-2 space-y-0">
                             <FormControl>
                               <RadioGroupItem value="single" />
                             </FormControl>
@@ -194,7 +206,7 @@ export function AddContractForm({
                               Parcela Única
                             </FormLabel>
                           </FormItem>
-                          <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormItem className="flex items-center space-x-2 space-y-0">
                             <FormControl>
                               <RadioGroupItem value="installment" />
                             </FormControl>
@@ -208,12 +220,29 @@ export function AddContractForm({
                     </FormItem>
                   )}
                 />
+
+                {contractType === 'installment' && (
+                     <FormField
+                        control={form.control}
+                        name="installments"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Número de Parcelas</FormLabel>
+                            <FormControl>
+                            <Input type="number" placeholder="2" step="1" min="2" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                )}
+               
                 <FormField
                   control={form.control}
                   name="dueDate"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>Data de Vencimento</FormLabel>
+                      <FormLabel>Data do 1º Vencimento</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>
@@ -238,7 +267,6 @@ export function AddContractForm({
                             mode="single"
                             selected={field.value}
                             onSelect={field.onChange}
-                            disabled={(date) => date < new Date()}
                             initialFocus
                           />
                         </PopoverContent>

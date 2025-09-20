@@ -6,7 +6,6 @@ import {
   getContracts,
   getClients,
   deleteContract,
-  updateContractStatus,
 } from '@/actions';
 import { Button } from '@/components/ui/button';
 import {
@@ -32,33 +31,8 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { format } from 'date-fns';
 import { ContractCard } from './components/contract-card';
 import { Input } from '@/components/ui/input';
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { CheckedState } from '@radix-ui/react-checkbox';
-
-const statusTranslations: { [key: string]: string } = {
-    paid: 'Pagos',
-    pending: 'Pendentes',
-    overdue: 'Atrasados',
-    'written-off': 'Baixados',
-    'pending,overdue': 'Pendentes e Atrasados'
-};
-
-const statusOptions: {id: ContractStatus, label: string}[] = [
-    {id: 'pending', label: 'Pendente'},
-    {id: 'overdue', label: 'Atrasado'},
-    {id: 'paid', label: 'Pago'},
-    {id: 'written-off', label: 'Baixado'},
-]
 
 function ContractsPageContent() {
   const [contracts, setContracts] = useState<Contract[]>([]);
@@ -74,8 +48,6 @@ function ContractsPageContent() {
   const router = useRouter();
 
   const clientId = searchParams.get('clientId');
-  const filterStatus = searchParams.get('status');
-  const filterDueDate = searchParams.get('dueDate');
 
   const filteredClient = useMemo(() => {
     return clients.find((c) => c.id === clientId);
@@ -95,48 +67,22 @@ function ContractsPageContent() {
     fetchData();
   }, []);
 
-  const baseFilteredContracts = useMemo(() => {
+  const filteredContracts = useMemo(() => {
     let filtered = [...contracts];
     if (clientId) {
         filtered = filtered.filter((contract) => contract.clientId === clientId);
     }
-    if (filterStatus) {
-        const statuses = filterStatus.split(',') as ContractStatus[];
-        filtered = filtered.filter((contract) => statuses.includes(contract.status));
-    }
-    if (filterDueDate === 'today') {
-        const today = format(new Date(), 'yyyy-MM-dd');
-        filtered = filtered.filter((contract) => contract.dueDate === today);
-    }
-    return filtered;
-  }, [contracts, clientId, filterStatus, filterDueDate]);
-  
-  const filteredContracts = useMemo(() => {
-      if (!filter) return baseFilteredContracts;
-      return baseFilteredContracts.filter(contract => contract.clientName.toLowerCase().includes(filter.toLowerCase()));
-  }, [baseFilteredContracts, filter]);
+    if (!filter) return filtered;
+    
+    return filtered.filter(contract => contract.clientName.toLowerCase().includes(filter.toLowerCase()));
+  }, [contracts, clientId, filter]);
 
 
   const getFilterDescription = () => {
-    let descriptions: React.ReactNode[] = [];
     if(clientId && filteredClient) {
-        descriptions.push(<>para o cliente: <span className="font-semibold">{filteredClient?.name}</span></>);
+        return <>para o cliente: <span className="font-semibold">{filteredClient?.name}</span></>;
     }
-    if(filterStatus) {
-        const translated = filterStatus.split(',').map(s => statusTranslations[s] || s).join(' e ');
-        descriptions.push(<>com status: <span className="font-semibold">{translated}</span></>);
-    }
-    if(filterDueDate === 'today') {
-        descriptions.push(<>com <span className="font-semibold">vencimento hoje</span></>);
-    }
-
-    return descriptions.reduce((prev, curr, i) => (
-      <>
-        {prev}
-        {i > 0 && ' e '}
-        {curr}
-      </>
-    ), <></>);
+    return '';
   }
 
 
@@ -188,44 +134,8 @@ function ContractsPageContent() {
     }
   };
 
-  const handleMarkAsPaid = async (contractId: string) => {
-    try {
-      const updatedContract = await updateContractStatus(contractId, 'paid');
-      handleContractUpdated(updatedContract);
-      toast({
-        title: 'Contrato Atualizado',
-        description: `Contrato ${contractId} marcado como pago.`,
-      });
-    } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Erro',
-        description: 'Falha ao atualizar o status do contrato.',
-      });
-    }
-  };
-
   const clearFilter = () => {
     router.push('/contracts');
-  };
-
-  const handleStatusFilterChange = (status: ContractStatus) => (checked: CheckedState) => {
-    const currentStatuses = filterStatus ? filterStatus.split(',') : [];
-    let newStatuses: string[];
-
-    if (checked) {
-      newStatuses = [...currentStatuses, status];
-    } else {
-      newStatuses = currentStatuses.filter(s => s !== status);
-    }
-
-    const params = new URLSearchParams(searchParams.toString());
-    if (newStatuses.length > 0) {
-      params.set('status', newStatuses.join(','));
-    } else {
-      params.delete('status');
-    }
-    router.push(`/contracts?${params.toString()}`);
   };
 
   return (
@@ -238,7 +148,7 @@ function ContractsPageContent() {
         </Button>
       </div>
 
-      {(clientId || filterStatus || filterDueDate) && (
+      {(clientId) && (
         <div className="flex items-center gap-2 rounded-lg border bg-secondary/50 p-3">
           <span className="text-sm">
             Mostrando contratos {getFilterDescription()}
@@ -278,7 +188,7 @@ function ContractsPageContent() {
             <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
             <AlertDialogDescription>
               Esta ação não pode ser desfeita. Isso excluirá permanentemente o
-              contrato.
+              contrato e todas as faturas associadas a ele.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -305,27 +215,6 @@ function ContractsPageContent() {
                     onChange={(e) => setFilter(e.target.value)}
                     className="h-9 w-full max-w-sm"
                 />
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm" className="h-9">
-                        <ListFilter className="mr-2 h-4 w-4" />
-                        Situação
-                    </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Filtrar por Situação</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    {statusOptions.map(option => (
-                        <DropdownMenuCheckboxItem
-                            key={option.id}
-                            checked={filterStatus?.includes(option.id)}
-                            onCheckedChange={handleStatusFilterChange(option.id)}
-                        >
-                            {option.label}
-                        </DropdownMenuCheckboxItem>
-                    ))}
-                    </DropdownMenuContent>
-                </DropdownMenu>
             </div>
         </CardHeader>
         <CardContent>
@@ -340,7 +229,6 @@ function ContractsPageContent() {
                         key={contract.id}
                         contract={contract}
                         onViewDetails={handleViewDetails}
-                        onMarkAsPaid={handleMarkAsPaid}
                         onDelete={handleDeleteClick}
                     />
                 ))}

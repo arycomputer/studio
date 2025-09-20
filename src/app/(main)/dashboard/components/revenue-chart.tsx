@@ -9,7 +9,7 @@ import {
   YAxis,
   Tooltip,
 } from 'recharts';
-import { Contract } from '@/lib/types';
+import { Invoice } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   ChartContainer,
@@ -17,24 +17,29 @@ import {
 } from '@/components/ui/chart';
 
 interface RevenueChartProps {
-  contracts: Contract[];
+  invoices: Invoice[];
 }
 
-export function RevenueChart({ contracts }: RevenueChartProps) {
-  const monthlyRevenue = contracts
-    .filter((contract) => contract.status === 'paid' && contract.paymentDate)
-    .reduce((acc, contract) => {
-      const month = new Date(contract.paymentDate!).toLocaleString('pt-BR', {
+export function RevenueChart({ invoices }: RevenueChartProps) {
+  const monthlyRevenue = invoices
+    .filter((invoice) => invoice.status === 'paid' && invoice.paymentDate)
+    .reduce((acc, invoice) => {
+      const date = new Date(invoice.paymentDate!);
+      date.setMinutes(date.getMinutes() + date.getTimezoneOffset());
+      const month = date.toLocaleString('pt-BR', {
         month: 'short',
       });
-      acc[month] = (acc[month] || 0) + contract.amount;
+      acc[month] = (acc[month] || 0) + invoice.amount;
       return acc;
     }, {} as Record<string, number>);
 
-  const chartData = Object.keys(monthlyRevenue).map((month) => ({
-    name: month,
-    total: monthlyRevenue[month],
-  }));
+    const monthOrder = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
+
+  const chartData = monthOrder.map(month => ({
+    name: month.charAt(0).toUpperCase() + month.slice(1),
+    total: monthlyRevenue[month.toLowerCase()] || 0,
+  })).filter(d => d.total > 0);
+
 
   const chartConfig = {
     total: {

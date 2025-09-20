@@ -48,7 +48,7 @@ export function ClientCard({ client, onEdit, onDelete, onViewContracts }: Client
                     </Avatar>
                     <div>
                         <CardTitle className="text-base font-semibold">{client.name}</CardTitle>
-                        <p className="text-xs text-muted-foreground">Juros: {client.rate}%</p>
+                        <p className="text-xs text-muted-foreground">Taxa Padrão: {client.rate}%</p>
                     </div>
                 </div>
                  <DropdownMenu>

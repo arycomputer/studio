@@ -24,12 +24,12 @@ import {
   Activity,
   AlertTriangle,
 } from 'lucide-react';
-import { getContracts, getClients } from '@/actions';
+import { getInvoices, getClients, getContracts } from '@/actions';
 import { RevenueChart } from './revenue-chart';
 import { format } from 'date-fns';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import type { Contract, Client } from '@/lib/types';
+import { useEffect, useState, useMemo } from 'react';
+import type { Invoice, Client, Contract } from '@/lib/types';
 
 const statusTranslations: { [key: string]: string } = {
   paid: 'Paga',
@@ -39,47 +39,57 @@ const statusTranslations: { [key: string]: string } = {
 };
 
 export function DashboardClientContent() {
-  const [contracts, setContracts] = useState<Contract[]>([]);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
+  const [contracts, setContracts] = useState<Contract[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
-      const [contractsData, clientsData] = await Promise.all([
-        getContracts(),
+      const [invoicesData, clientsData, contractsData] = await Promise.all([
+        getInvoices(),
         getClients(),
+        getContracts(),
       ]);
-      setContracts(contractsData);
+      setInvoices(invoicesData);
       setClients(clientsData);
+      setContracts(contractsData);
       setLoading(false);
     }
     fetchData();
   }, []);
 
+  const totalRevenue = useMemo(() => invoices
+    .filter((invoice) => invoice.status === 'paid')
+    .reduce((sum, invoice) => sum + invoice.amount, 0), [invoices]);
+
+  const outstandingRevenue = useMemo(() => invoices
+    .filter((invoice) => invoice.status === 'pending' || invoice.status === 'overdue')
+    .reduce((sum, invoice) => sum + invoice.amount, 0), [invoices]);
+    
+  const clientsWithPending = useMemo(() => {
+     const pendingClientIds = new Set(invoices.filter(i => i.status === 'pending' || i.status === 'overdue').map(i => i.clientId));
+     return clients.filter(c => pendingClientIds.has(c.id));
+  }, [invoices, clients]);
+
+  const recentInvoices = useMemo(() => invoices.slice(0, 5), [invoices]);
+
+  const dueToday = useMemo(() => {
+      const today = format(new Date(), 'yyyy-MM-dd');
+      return invoices.filter(invoice => invoice.dueDate === today && invoice.status !== 'paid');
+  }, [invoices]);
+
+
   if (loading) {
     return <div className="flex justify-center items-center h-full"><p>Carregando dados...</p></div>;
   }
-  
-  const totalRevenue = contracts
-    .filter((contract) => contract.status === 'paid')
-    .reduce((sum, contract) => sum + contract.amount, 0);
-
-  const outstandingRevenue = contracts
-    .filter((contract) => contract.status === 'pending' || contract.status === 'overdue')
-    .reduce((sum, contract) => sum + contract.amount, 0);
-
-  const recentContracts = contracts.slice(0, 5);
-
-  const today = format(new Date(), 'yyyy-MM-dd');
-  const dueToday = contracts.filter(contract => contract.dueDate === today && contract.status !== 'paid');
-
 
   return (
     <div className="flex flex-col gap-8">
       <h1 className="text-3xl font-headline font-bold">Painel</h1>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Link href="/contracts?status=paid">
+        <Link href="/invoices?status=paid">
             <Card className="hover:bg-muted/50 transition-colors">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Receita Total</CardTitle>
@@ -90,12 +100,12 @@ export function DashboardClientContent() {
                 {totalRevenue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                Receita de todos os tempos de contratos pagos.
+                Receita de todos os tempos de faturas pagas.
                 </p>
             </CardContent>
             </Card>
         </Link>
-        <Link href="/contracts?status=pending,overdue">
+        <Link href="/invoices?status=pending,overdue">
             <Card className="hover:bg-muted/50 transition-colors">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
@@ -108,7 +118,7 @@ export function DashboardClientContent() {
                  {outstandingRevenue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                De contratos pendentes e vencidos.
+                De faturas pendentes e vencidas.
                 </p>
             </CardContent>
             </Card>
@@ -120,9 +130,9 @@ export function DashboardClientContent() {
                 <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-                <div className="text-2xl font-bold">+{clients.length}</div>
+                <div className="text-2xl font-bold">+{clientsWithPending.length}</div>
                 <p className="text-xs text-muted-foreground">
-                Clientes com pagamentos pendentes.
+                Clientes com faturas pendentes ou vencidas.
                 </p>
             </CardContent>
             </Card>
@@ -130,13 +140,13 @@ export function DashboardClientContent() {
         <Link href="/contracts">
             <Card className="hover:bg-muted/50 transition-colors">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Contratos Totais</CardTitle>
+                <CardTitle className="text-sm font-medium">Contratos Ativos</CardTitle>
                 <Activity className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-                <div className="text-2xl font-bold">{contracts.length}</div>
+                <div className="text-2xl font-bold">{contracts.filter(c => c.status === 'active').length}</div>
                 <p className="text-xs text-muted-foreground">
-                Total de contratos gerados.
+                Total de contratos ativos.
                 </p>
             </CardContent>
             </Card>
@@ -146,14 +156,14 @@ export function DashboardClientContent() {
       <div className="grid gap-4 lg:grid-cols-7">
         <Card className="lg:col-span-4">
           <CardHeader>
-            <CardTitle className="font-headline">Visão Geral</CardTitle>
+            <CardTitle className="font-headline">Visão Geral da Receita</CardTitle>
           </CardHeader>
           <CardContent className="pl-2">
-            <RevenueChart contracts={contracts} />
+            <RevenueChart invoices={invoices} />
           </CardContent>
         </Card>
         <div className="lg:col-span-3 flex flex-col gap-4">
-            <Link href="/contracts?dueDate=today">
+            <Link href="/invoices?dueDate=today">
                 <Card className="hover:bg-muted/50 transition-colors">
                     <CardHeader>
                         <CardTitle className="font-headline flex items-center gap-2">
@@ -161,7 +171,7 @@ export function DashboardClientContent() {
                             Vencimentos do Dia
                         </CardTitle>
                         <CardDescription>
-                            Contratos que precisam de atenção imediata.
+                            Faturas que precisam de atenção imediata.
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -175,13 +185,13 @@ export function DashboardClientContent() {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {dueToday.map((contract) => (
-                                    <TableRow key={contract.id}>
+                                    {dueToday.map((invoice) => (
+                                    <TableRow key={invoice.id}>
                                         <TableCell className='py-2'>
-                                        <div className="font-medium">{contract.clientName}</div>
+                                        <div className="font-medium">{invoice.clientName}</div>
                                         </TableCell>
                                         <TableCell className="text-right py-2">
-                                        {contract.amount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                        {invoice.amount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                         </TableCell>
                                     </TableRow>
                                     ))}
@@ -189,16 +199,16 @@ export function DashboardClientContent() {
                             </Table>
                         </div>
                         ) : (
-                        <p className="text-sm text-muted-foreground">Nenhum contrato vence hoje.</p>
+                        <p className="text-sm text-muted-foreground">Nenhuma fatura vence hoje.</p>
                         )}
                     </CardContent>
                 </Card>
             </Link>
             <Card>
             <CardHeader>
-                <CardTitle className="font-headline">Contratos Recentes</CardTitle>
+                <CardTitle className="font-headline">Faturas Recentes</CardTitle>
                 <CardDescription>
-                Os contratos criados mais recentemente.
+                As faturas criadas mais recentemente.
                 </CardDescription>
             </CardHeader>
             <CardContent>
@@ -212,30 +222,30 @@ export function DashboardClientContent() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {recentContracts.map((contract) => (
-                        <TableRow key={contract.id}>
+                        {recentInvoices.map((invoice) => (
+                        <TableRow key={invoice.id}>
                             <TableCell>
-                            <div className="font-medium">{contract.clientName}</div>
+                            <div className="font-medium">{invoice.clientName}</div>
                             <div className="text-sm text-muted-foreground truncate max-w-[120px] sm:max-w-none">
-                                {contract.clientEmail}
+                                {invoice.clientEmail}
                             </div>
                             </TableCell>
                             <TableCell>
                             <Badge
                                 variant={
-                                contract.status === 'paid'
+                                invoice.status === 'paid'
                                     ? 'success'
-                                    : contract.status === 'overdue'
+                                    : invoice.status === 'overdue'
                                     ? 'destructive'
                                     : 'secondary'
                                 }
                                 className="capitalize"
                             >
-                                {statusTranslations[contract.status]}
+                                {statusTranslations[invoice.status]}
                             </Badge>
                             </TableCell>
                             <TableCell className="text-right">
-                            {contract.amount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                            {invoice.amount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                             </TableCell>
                         </TableRow>
                         ))}

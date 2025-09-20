@@ -2,7 +2,7 @@
 'use client';
 
 import { Suspense, useEffect, useMemo, useState } from 'react';
-import { deleteClient, getClients, getContracts } from '@/actions';
+import { deleteClient, getClients, getInvoices } from '@/actions';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { PlusCircle, X } from 'lucide-react';
-import type { Client, Contract } from '@/lib/types';
+import type { Client, Invoice } from '@/lib/types';
 import { AddClientForm } from './components/add-client-form';
 import { EditClientForm } from './components/edit-client-form';
 import {
@@ -40,7 +40,7 @@ const statusTranslations: { [key: string]: string } = {
 
 function ClientsPageContent() {
   const [clients, setClients] = useState<Client[]>([]);
-  const [contracts, setContracts] = useState<Contract[]>([]);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAddClientOpen, setAddClientOpen] = useState(false);
   const [isEditClientOpen, setEditClientOpen] = useState(false);
@@ -56,12 +56,12 @@ function ClientsPageContent() {
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
-      const [clientsData, contractsData] = await Promise.all([
+      const [clientsData, invoicesData] = await Promise.all([
         getClients(),
-        getContracts(),
+        getInvoices(),
       ]);
       setClients(clientsData);
-      setContracts(contractsData);
+      setInvoices(invoicesData);
       setLoading(false);
     }
     fetchData();
@@ -134,18 +134,18 @@ function ClientsPageContent() {
   };
 
   const clientData = useMemo(() => clients.map((client) => {
-    const clientContracts = contracts.filter((inv) => inv.clientId === client.id);
-    const totalInvoiced = clientContracts.reduce(
+    const clientInvoices = invoices.filter((inv) => inv.clientId === client.id);
+    const totalInvoiced = clientInvoices.reduce(
       (sum, inv) => sum + inv.amount,
       0
     );
-    const totalPaid = clientContracts
+    const totalPaid = clientInvoices
       .filter((inv) => inv.status === 'paid')
       .reduce((sum, inv) => sum + inv.amount, 0);
     const balance = totalInvoiced - totalPaid;
-    const isOverdue = clientContracts.some(inv => inv.status === 'overdue');
+    const isOverdue = clientInvoices.some(inv => inv.status === 'overdue');
     return { ...client, totalInvoiced, totalPaid, balance, isOverdue };
-  }), [clients, contracts]);
+  }), [clients, invoices]);
 
   const filteredData = useMemo(() => {
     let baseData = [...clientData];
@@ -220,7 +220,7 @@ function ClientsPageContent() {
             <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
             <AlertDialogDescription>
               Esta ação não pode ser desfeita. Isso excluirá permanentemente o
-              cliente e todas os seus contratos associados.
+              cliente e todos os seus contratos e faturas associados.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
