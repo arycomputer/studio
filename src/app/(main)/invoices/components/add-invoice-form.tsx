@@ -103,7 +103,12 @@ export function AddInvoiceForm({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog open={isOpen} onOpenChange={(open) => {
+        if (!open) {
+            form.reset();
+        }
+        onOpenChange(open);
+    }}>
       <DialogContent className="sm:max-w-md max-h-[90svh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Criar Nova Fatura</DialogTitle>
