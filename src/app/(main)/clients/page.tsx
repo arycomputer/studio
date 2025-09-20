@@ -220,7 +220,7 @@ function ClientsPageContent() {
             <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
             <AlertDialogDescription>
               Esta ação não pode ser desfeita. Isso excluirá permanentemente o
-              cliente e todas as suas faturas associadas.
+              cliente e todas os seus contratos associados.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -24,14 +24,14 @@ type ClientData = Client & {
 type GetColumnsProps = {
   onEdit: (client: Client) => void;
   onDelete: (client: Client) => void;
-  onViewInvoices: (client: Client) => void;
+  onViewContracts: (client: Client) => void;
 };
 
 
 export const getColumns = ({
   onEdit,
   onDelete,
-  onViewInvoices,
+  onViewContracts,
 }: GetColumnsProps): ColumnDef<ClientData>[] => [
   {
     accessorKey: 'name',
@@ -129,8 +129,8 @@ export const getColumns = ({
             <DropdownMenuItem onClick={() => onEdit(client)}>
               Editar
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onViewInvoices(client)}>
-              Ver Faturas
+            <DropdownMenuItem onClick={() => onViewContracts(client)}>
+              Ver Contratos
             </DropdownMenuItem>
             <DropdownMenuItem
               className="text-destructive"

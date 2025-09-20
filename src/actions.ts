@@ -233,4 +233,3 @@ export async function deleteContract(id: string): Promise<{ success: boolean }> 
     mockContracts.splice(contractIndex, 1);
     return { success: true };
 }
-
