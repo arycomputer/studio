@@ -8,7 +8,6 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarInset,
   SidebarTrigger,
   SidebarFooter,
 } from '@/components/ui/sidebar';
@@ -23,9 +22,6 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { UserNav } from '@/components/user-nav';
-import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 export default function MainLayout({
   children,
@@ -34,7 +30,7 @@ export default function MainLayout({
 }) {
   return (
     <SidebarProvider>
-      <div className="flex h-screen min-h-screen">
+      <div className="relative flex h-svh min-h-svh w-full overflow-hidden">
         <Sidebar collapsible="icon" className="border-r">
           <SidebarHeader>
             <div className="flex items-center gap-2 p-2">
@@ -94,7 +90,7 @@ export default function MainLayout({
           </SidebarFooter>
         </Sidebar>
 
-        <div className="flex flex-1 flex-col">
+        <div className="flex flex-1 flex-col overflow-y-auto">
           <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 md:px-6">
             <SidebarTrigger className="md:hidden">
               <PanelLeft />
@@ -105,7 +101,7 @@ export default function MainLayout({
             </div>
             <UserNav />
           </header>
-          <main className="flex-1 overflow-y-auto p-4 md:p-6">{children}</main>
+          <main className="flex-1 p-4 md:p-6">{children}</main>
         </div>
       </div>
     </SidebarProvider>
