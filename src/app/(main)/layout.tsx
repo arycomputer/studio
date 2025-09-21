@@ -34,7 +34,7 @@ export default function MainLayout({
 }) {
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen h-screen">
+      <div className="flex h-screen min-h-screen">
         <Sidebar collapsible="icon" className="border-r">
           <SidebarHeader>
             <div className="flex items-center gap-2 p-2">
@@ -94,7 +94,7 @@ export default function MainLayout({
           </SidebarFooter>
         </Sidebar>
 
-        <div className="flex-1 flex flex-col h-screen">
+        <div className="flex flex-1 flex-col">
           <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 md:px-6">
             <SidebarTrigger className="md:hidden">
               <PanelLeft />
