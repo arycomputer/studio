@@ -277,17 +277,26 @@ export async function generateInvoicesForContract(contractId: string): Promise<I
         };
         newInvoices.push(newInvoice);
     } else if (contract.type === 'installment' && contract.installments) {
-        const installmentAmount = contract.amount / contract.installments;
+        let remainingBalance = contract.amount;
+        const rate = contract.interestRate / 100;
+        
+        // Calculate the monthly payment using the formula for an annuity
+        const monthlyPayment = (remainingBalance * rate) / (1 - Math.pow(1 + rate, -contract.installments));
+
         for (let i = 0; i < contract.installments; i++) {
             const newId = `INV${(mockInvoices.length + i + 1).toString().padStart(3, '0')}`;
             const dueDate = addMonths(firstDueDate, i);
+
+            const interestForMonth = remainingBalance * rate;
+            const principalForMonth = monthlyPayment - interestForMonth;
+            
             const newInvoice: Invoice = {
                  id: newId,
                 contractId: contract.id,
                 clientId: contract.clientId,
                 clientName: contract.clientName,
                 clientEmail: contract.clientEmail,
-                amount: installmentAmount,
+                amount: monthlyPayment, // Use the calculated constant monthly payment
                 issueDate: format(issueDate, 'yyyy-MM-dd'),
                 dueDate: format(dueDate, 'yyyy-MM-dd'),
                 status: dueDate < issueDate ? 'overdue' : 'pending',
@@ -296,6 +305,9 @@ export async function generateInvoicesForContract(contractId: string): Promise<I
                 totalInstallments: contract.installments,
             };
             newInvoices.push(newInvoice);
+            
+            // Update the remaining balance for the next iteration
+            remainingBalance -= principalForMonth;
         }
     }
 
