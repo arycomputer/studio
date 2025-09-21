@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import type { Contract } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import { MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal, Eye, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 
 const statusTranslations: { [key: string]: string } = {
@@ -64,13 +64,15 @@ export function ContractCard({ contract, onViewDetails, onDelete }: GetColumnsPr
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Ações</DropdownMenuLabel>
                         <DropdownMenuItem onClick={() => onViewDetails(contract)}>
-                        Ver Detalhes
+                            <Eye className="mr-2 h-4 w-4" />
+                            Ver Detalhes
                         </DropdownMenuItem>
                         <DropdownMenuItem
                         className="text-destructive"
                         onClick={() => onDelete(contract)}
                         >
-                        Excluir
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Excluir
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

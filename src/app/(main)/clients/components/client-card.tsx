@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import type { Client } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import { MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal, FilePen, FileText, Trash2 } from 'lucide-react';
 
 type ClientData = Client & {
   totalInvoiced: number;
@@ -61,16 +61,19 @@ export function ClientCard({ client, onEdit, onDelete, onViewContracts }: Client
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Ações</DropdownMenuLabel>
                         <DropdownMenuItem onClick={() => onEdit(client)}>
-                        Editar
+                            <FilePen className="mr-2 h-4 w-4" />
+                            Editar
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => onViewContracts(client)}>
-                        Ver Contratos
+                            <FileText className="mr-2 h-4 w-4" />
+                            Ver Contratos
                         </DropdownMenuItem>
                         <DropdownMenuItem
                         className="text-destructive"
                         onClick={() => onDelete(client)}
                         >
-                        Excluir
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Excluir
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

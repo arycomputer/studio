@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import type { Invoice } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import { MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal, Eye, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 
 const statusTranslations: { [key: string]: string } = {
@@ -59,13 +59,15 @@ export function InvoiceCard({ invoice, onViewDetails, onDelete }: InvoiceCardPro
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Ações</DropdownMenuLabel>
                         <DropdownMenuItem onClick={() => onViewDetails(invoice)}>
-                        Ver Detalhes
+                            <Eye className="mr-2 h-4 w-4" />
+                            Ver Detalhes
                         </DropdownMenuItem>
                         <DropdownMenuItem
                         className="text-destructive"
                         onClick={() => onDelete(invoice)}
                         >
-                        Excluir
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Excluir
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
