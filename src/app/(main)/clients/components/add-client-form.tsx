@@ -227,7 +227,7 @@ export function AddClientForm({
         }
         onOpenChange(open);
     }}>
-      <DialogContent className="sm:max-w-lg max-h-[90svh] flex flex-col">
+      <DialogContent className="sm:max-w-lg max-h-[90vh] flex flex-col">
         <DialogHeader className="px-6 pt-6">
           <DialogTitle>Adicionar Novo Cliente</DialogTitle>
           <DialogDescription>

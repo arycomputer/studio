@@ -288,7 +288,7 @@ export function EditClientForm({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg max-h-[90svh] flex flex-col">
+      <DialogContent className="sm:max-w-lg max-h-[90vh] flex flex-col">
         <DialogHeader className="px-6 pt-6">
           <DialogTitle>Editar Cliente</DialogTitle>
           <DialogDescription>

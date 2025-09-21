@@ -125,7 +125,7 @@ export function AddContractForm({
         }
         onOpenChange(open);
     }}>
-      <DialogContent className="sm:max-w-md max-h-[90svh] flex flex-col">
+      <DialogContent className="sm:max-w-md max-h-[90vh] flex flex-col">
         <DialogHeader className="px-6 pt-6">
           <DialogTitle>Criar Novo Contrato</DialogTitle>
           <DialogDescription>
