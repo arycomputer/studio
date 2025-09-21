@@ -42,6 +42,7 @@ import { CalendarIcon, Loader2 } from 'lucide-react';
 import type { Client, Contract } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
@@ -255,7 +256,7 @@ export function AddContractForm({
                                 )}
                               >
                                 {field.value ? (
-                                  format(field.value, 'PPP')
+                                  format(field.value, 'PPP', { locale: ptBR })
                                 ) : (
                                   <span>Escolha uma data</span>
                                 )}
@@ -268,6 +269,7 @@ export function AddContractForm({
                               mode="single"
                               selected={field.value}
                               onSelect={field.onChange}
+                              locale={ptBR}
                               initialFocus
                             />
                           </PopoverContent>
