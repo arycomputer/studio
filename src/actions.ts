@@ -125,7 +125,7 @@ export async function deleteClient(id: string): Promise<{ success: boolean }> {
         if (cIndex !== -1) mockContracts.splice(cIndex, 1);
     });
 
-    const invoicesToDelete = mockInvoices.filter(i => i.clientId === id);
+    const invoicesToDelete = mockInvoices.filter(i => i.contractId === id);
     invoicesToDelete.forEach(i => {
         const iIndex = mockInvoices.findIndex(inv => inv.id === i.id);
         if (iIndex !== -1) mockInvoices.splice(iIndex, 1);
@@ -277,18 +277,20 @@ export async function generateInvoicesForContract(contractId: string): Promise<I
         };
         newInvoices.push(newInvoice);
     } else if (contract.type === 'installment' && contract.installments) {
-        let remainingBalance = contract.amount;
-        const rate = contract.interestRate / 100;
+        const rate = contract.interestRate > 0 ? contract.interestRate / 100 : 0;
         
-        // Calculate the monthly payment using the formula for an annuity
-        const monthlyPayment = (remainingBalance * rate) / (1 - Math.pow(1 + rate, -contract.installments));
+        let monthlyPayment;
+        if (rate > 0) {
+            // Tabela Price: Fixed monthly payment
+            monthlyPayment = (contract.amount * rate) / (1 - Math.pow(1 + rate, -contract.installments));
+        } else {
+            // No interest, just divide the amount
+            monthlyPayment = contract.amount / contract.installments;
+        }
 
         for (let i = 0; i < contract.installments; i++) {
             const newId = `INV${(mockInvoices.length + i + 1).toString().padStart(3, '0')}`;
             const dueDate = addMonths(firstDueDate, i);
-
-            const interestForMonth = remainingBalance * rate;
-            const principalForMonth = monthlyPayment - interestForMonth;
             
             const newInvoice: Invoice = {
                  id: newId,
@@ -296,7 +298,7 @@ export async function generateInvoicesForContract(contractId: string): Promise<I
                 clientId: contract.clientId,
                 clientName: contract.clientName,
                 clientEmail: contract.clientEmail,
-                amount: monthlyPayment, // Use the calculated constant monthly payment
+                amount: monthlyPayment,
                 issueDate: format(issueDate, 'yyyy-MM-dd'),
                 dueDate: format(dueDate, 'yyyy-MM-dd'),
                 status: dueDate < issueDate ? 'overdue' : 'pending',
@@ -305,12 +307,37 @@ export async function generateInvoicesForContract(contractId: string): Promise<I
                 totalInstallments: contract.installments,
             };
             newInvoices.push(newInvoice);
-            
-            // Update the remaining balance for the next iteration
-            remainingBalance -= principalForMonth;
         }
     }
 
     mockInvoices.unshift(...newInvoices);
     return newInvoices;
+}
+
+export async function generateInvoicesForAllActiveContracts(): Promise<{ generatedCount: number }> {
+    await delay(1000);
+
+    const activeContracts = mockContracts.filter(c => c.status === 'active');
+    const contractsToGenerate = activeContracts.filter(c => {
+        const existingInvoices = mockInvoices.some(inv => inv.contractId === c.id);
+        return !existingInvoices;
+    });
+
+    if (contractsToGenerate.length === 0) {
+        return { generatedCount: 0 };
+    }
+
+    let totalGenerated = 0;
+
+    for (const contract of contractsToGenerate) {
+        try {
+            const generated = await generateInvoicesForContract(contract.id);
+            totalGenerated += generated.length;
+        } catch (error) {
+            console.error(`Failed to generate invoices for contract ${contract.id}:`, error);
+            // Continue to the next contract even if one fails
+        }
+    }
+
+    return { generatedCount: totalGenerated };
 }

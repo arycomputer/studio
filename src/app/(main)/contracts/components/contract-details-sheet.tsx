@@ -75,6 +75,21 @@ export function ContractDetailsSheet({
     }
   }
 
+  const getInstallmentValue = () => {
+    if (!contract || contract.type !== 'installment' || !contract.installments) return null;
+
+    const rate = contract.interestRate > 0 ? contract.interestRate / 100 : 0;
+    let monthlyPayment;
+
+    if (rate > 0) {
+      monthlyPayment = (contract.amount * rate) / (1 - Math.pow(1 + rate, -contract.installments));
+    } else {
+      monthlyPayment = contract.amount / contract.installments;
+    }
+    
+    return monthlyPayment.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  }
+
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
@@ -107,7 +122,7 @@ export function ContractDetailsSheet({
               {contract.type === 'installment' && contract.installments && (
                  <div className="flex justify-between items-center">
                   <span className="font-medium text-muted-foreground">Parcelas</span>
-                  <span>{contract.installments}x de {(contract.amount / contract.installments).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                  <span>{contract.installments}x de {getInstallmentValue()}</span>
                 </div>
               )}
               <div className="flex justify-between items-center">

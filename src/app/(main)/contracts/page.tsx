@@ -6,6 +6,7 @@ import {
   getContracts,
   getClients,
   deleteContract,
+  generateInvoicesForAllActiveContracts,
 } from '@/actions';
 import { Button } from '@/components/ui/button';
 import {
@@ -15,7 +16,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { PlusCircle, X, ListFilter } from 'lucide-react';
+import { PlusCircle, X, ListFilter, FileClock, Loader2 } from 'lucide-react';
 import type { Contract, Client, ContractStatus } from '@/lib/types';
 import { AddContractForm } from './components/add-contract-form';
 import { ContractDetailsSheet } from './components/contract-details-sheet';
@@ -38,6 +39,7 @@ function ContractsPageContent() {
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [isAddContractOpen, setAddContractOpen] = useState(false);
   const [isDetailsSheetOpen, setDetailsSheetOpen] = useState(false);
   const [selectedContract, setSelectedContract] = useState<Contract | null>(null);
@@ -134,18 +136,50 @@ function ContractsPageContent() {
     }
   };
 
+  const handleGenerateAllInvoices = async () => {
+    setIsGenerating(true);
+    try {
+      const result = await generateInvoicesForAllActiveContracts();
+      if (result.generatedCount > 0) {
+        toast({
+          title: 'Faturas Geradas!',
+          description: `${result.generatedCount} novas faturas foram criadas com sucesso.`,
+        });
+      } else {
+        toast({
+          title: 'Nenhuma Fatura Gerada',
+          description: 'Todos os contratos ativos já possuem faturas.',
+        });
+      }
+    } catch (error) {
+       toast({
+        variant: 'destructive',
+        title: 'Erro ao Gerar Faturas',
+        description: 'Ocorreu um erro ao tentar gerar as faturas em lote.',
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const clearFilter = () => {
     router.push('/contracts');
   };
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-3xl font-headline font-bold">Contratos</h1>
-        <Button onClick={() => setAddContractOpen(true)}>
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Criar Contrato
-        </Button>
+        <div className="flex flex-wrap gap-2">
+            <Button variant="outline" onClick={handleGenerateAllInvoices} disabled={isGenerating}>
+                 {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileClock className="mr-2 h-4 w-4" />}
+                Gerar Faturas Pendentes
+            </Button>
+            <Button onClick={() => setAddContractOpen(true)}>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Criar Contrato
+            </Button>
+        </div>
       </div>
 
       {(clientId) && (
