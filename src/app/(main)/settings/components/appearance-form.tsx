@@ -17,7 +17,9 @@ import {
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { cn } from '@/lib/utils';
+import { Check } from 'lucide-react';
 
 const appearanceFormSchema = z.object({
   theme: z.enum(['light', 'dark'], {
@@ -27,9 +29,18 @@ const appearanceFormSchema = z.object({
 
 type AppearanceFormValues = z.infer<typeof appearanceFormSchema>;
 
+const themes = [
+  { name: 'zinc', label: 'Zinco', color: 'hsl(240 5.9% 10%)' },
+  { name: 'slate', label: 'Ardósia', color: 'hsl(215.4 16.3% 46.9%)' },
+  { name: 'stone', label: 'Pedra', color: 'hsl(25 5.3% 44.7%)' },
+  { name: 'gray', label: 'Cinza', color: 'hsl(220 8.9% 46.1%)' },
+  { name: 'neutral', label: 'Neutro', color: 'hsl(0 0% 45.1%)' },
+];
 
 export function AppearanceForm() {
   const { toast } = useToast();
+  const [mounted, setMounted] = useState(false);
+  const [activeTheme, setActiveTheme] = useState('zinc');
 
   const form = useForm<AppearanceFormValues>({
     resolver: zodResolver(appearanceFormSchema),
@@ -39,15 +50,39 @@ export function AppearanceForm() {
   });
 
   useEffect(() => {
-    const storedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
-    if (storedTheme) {
-      form.setValue('theme', storedTheme);
-      document.documentElement.classList.toggle('dark', storedTheme === 'dark');
+    setMounted(true);
+    const storedThemeMode = localStorage.getItem('theme_mode') as 'light' | 'dark' | null;
+    if (storedThemeMode) {
+      form.setValue('theme', storedThemeMode);
+      document.documentElement.classList.toggle('dark', storedThemeMode === 'dark');
+    }
+    
+    const storedThemeName = localStorage.getItem('theme_name');
+    if (storedThemeName) {
+      setActiveTheme(storedThemeName);
+      document.body.classList.forEach(className => {
+        if (className.startsWith('theme-')) {
+          document.body.classList.remove(className);
+        }
+      });
+      document.body.classList.add(`theme-${storedThemeName}`);
     }
   }, [form]);
 
+  useEffect(() => {
+    if (mounted) {
+      localStorage.setItem('theme_name', activeTheme);
+      document.body.classList.forEach(className => {
+        if (className.startsWith('theme-')) {
+          document.body.classList.remove(className);
+        }
+      });
+      document.body.classList.add(`theme-${activeTheme}`);
+    }
+  }, [activeTheme, mounted]);
+  
   function onSubmit(data: AppearanceFormValues) {
-    localStorage.setItem('theme', data.theme);
+    localStorage.setItem('theme_mode', data.theme);
     document.documentElement.classList.toggle('dark', data.theme === 'dark');
     
     toast({
@@ -61,7 +96,7 @@ export function AppearanceForm() {
       <CardHeader>
         <CardTitle>Aparência</CardTitle>
         <CardDescription>
-          Personalize a aparência do aplicativo. Alterne entre o modo claro e escuro.
+          Personalize a aparência do aplicativo. Alterne entre o modo claro e escuro e escolha um tema de cores.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -139,6 +174,34 @@ export function AppearanceForm() {
                 </FormItem>
               )}
             />
+
+            <div className="space-y-1">
+                <FormLabel>Cor</FormLabel>
+                <FormDescription>
+                    Selecione a cor de destaque para o painel.
+                </FormDescription>
+                <div className="flex flex-wrap gap-3 pt-2">
+                    {themes.map((theme) => (
+                    <Button
+                        key={theme.name}
+                        type="button"
+                        variant="outline"
+                        className={cn(
+                        'justify-start',
+                        activeTheme === theme.name && 'border-2 border-primary'
+                        )}
+                        onClick={() => setActiveTheme(theme.name)}
+                    >
+                        <div
+                        className="mr-2 h-5 w-5 rounded-full"
+                        style={{ backgroundColor: theme.color }}
+                        />
+                        {theme.label}
+                        {activeTheme === theme.name && <Check className="ml-auto h-4 w-4" />}
+                    </Button>
+                    ))}
+                </div>
+            </div>
 
             <Button type="submit">Salvar Preferências</Button>
           </form>
